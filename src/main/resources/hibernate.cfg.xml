@@ -1,0 +1,37 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+<session-factory>
+    <!-- Database connection settings -->
+    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="connection.url">jdbc:mysql://localhost:3306/joinery</property>
+    <property name="connection.username">root</property>
+    <property name="connection.password">password</property>
+    <!-- JDBC connection pool (use the built-in) -->
+    <property name="connection.pool_size">1</property> <!-- SQL dialect -->
+    <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+    <!-- Disable the second-level cache -->
+    <property name="cache.provider_class">org.hibernate.cache.internal.NoCachingRegionFactory</property>
+    <!-- Echo all executed SQL to stdout -->
+    <property name="show_sql">true</property>
+    <!-- Drop and re-create the database schema on startup -->
+    <property name="hbm2ddl.auto">validate</property> <!-- Enable Hibernate stats in the logs -->
+    <property name="hibernate.generate_statistics">true</property>
+    <!-- Full names the annotated entity class -->
+    <mapping class="com.example.joinery.entity.Person"/>
+    <mapping class="com.example.joinery.entity.Employee"/>
+    <mapping class="com.example.joinery.entity.Customer"/>
+    <mapping class="com.example.joinery.entity.RetailCustomer"/>
+    <mapping class="com.example.joinery.entity.WholesaleCustomer"/>
+    <mapping class="com.example.joinery.entity.License"/>
+    <mapping class="com.example.joinery.entity.Specialization"/>
+    <mapping class="com.example.joinery.entity.Service"/>
+    <mapping class="com.example.joinery.entity.Assembly"/>
+    <mapping class="com.example.joinery.entity.Conservation"/>
+    <mapping class="com.example.joinery.entity.Material"/>
+    <mapping class="com.example.joinery.entity.WoodMaterial"/>
+    <mapping class="com.example.joinery.entity.WoodLikeMaterial"/>
+    <mapping class="com.example.joinery.entity.Chemical"/>
+    <mapping class="com.example.joinery.entity.WorkOrder"/>
+</session-factory>
+</hibernate-configuration>
