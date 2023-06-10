@@ -53,6 +53,7 @@ public abstract class Service {
         this.workOrders = workOrders;
     }
 
+    public abstract int calculateServicePrice();
     @Override
     public String toString() {
         return " daysToComplete: " + getDaysToComplete() +

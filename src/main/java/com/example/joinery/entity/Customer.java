@@ -4,7 +4,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "customer")
@@ -49,7 +51,11 @@ public abstract class Customer {
     }
 
     public void setPaymentPreference(String paymentPreference) {
-        this.paymentPreference = paymentPreference;
+        if (Objects.equals(paymentPreference, PaymentPreference.card.name()) || Objects.equals(paymentPreference, PaymentPreference.cash.name())) {
+            this.paymentPreference = paymentPreference;
+        } else {
+            throw new IllegalArgumentException("Invalid payment preference value");
+        }
     }
 
     public String getContactPreference() {
@@ -57,7 +63,11 @@ public abstract class Customer {
     }
 
     public void setContactPreference(String contactPreference) {
-        this.contactPreference = contactPreference;
+        if (Objects.equals(contactPreference, ContactPreference.telephone.name()) || Objects.equals(contactPreference, ContactPreference.email.name())) {
+            this.contactPreference = contactPreference;
+        } else {
+            throw new IllegalArgumentException("Invalid contact preference value");
+        }
     }
 
     public String getTelephone() {
@@ -83,6 +93,12 @@ public abstract class Customer {
     public void setWorkOrders(List<WorkOrder> workOrders) {
         this.workOrders = workOrders;
     }
+
+    public int getMembershipAge(){
+        return Period.between(dateJoined, LocalDate.now()).getYears();
+    }
+
+    public abstract int calculateDiscount();
 
     @Override
     public String toString() {

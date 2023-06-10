@@ -73,7 +73,9 @@ public class WorkOrder {
     public void setEmployee(Employee employee) {
         this.employee = employee;
     }
-
+    public float getTotalPrice(){
+        return service.calculateServicePrice() * (float) (100 - customer.calculateDiscount()) /100;
+    }
     @Override
     public String toString() {
         return "WorkOrder{" +

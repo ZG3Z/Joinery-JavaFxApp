@@ -3,11 +3,13 @@ package com.example.joinery.entity;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "retailCustomer")
 @PrimaryKeyJoinColumn(name = "idCR")
 public class RetailCustomer extends Customer {
+    enum LoyaltyCardLevel {STANDARD, SILVER, GOLD}
     private String loyaltyCardLevel;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -17,7 +19,7 @@ public class RetailCustomer extends Customer {
     public RetailCustomer(){}
 
     public RetailCustomer(Long id, String firstName, String lastName, LocalDate dateOfBirth,  LocalDate dateJoined, String paymentPreference, String contactPreference,
-                          String telephone, String email, String loyaltyCardLevel, List<WorkOrder> workOrders){
+                          String telephone, String email, String loyaltyCardLevel){
         super();
 
         person.setId(id);
@@ -31,7 +33,6 @@ public class RetailCustomer extends Customer {
         setContactPreference(contactPreference);
         setTelephone(telephone);
         setEmail(email);
-        setWorkOrders(workOrders);
 
         this.loyaltyCardLevel = loyaltyCardLevel;
     }
@@ -74,7 +75,33 @@ public class RetailCustomer extends Customer {
     }
 
     public void setLoyaltyCardLevel(String loyaltyCardLevel) {
-        this.loyaltyCardLevel = loyaltyCardLevel;
+        if (Objects.equals(loyaltyCardLevel, LoyaltyCardLevel.STANDARD.name()) || Objects.equals(loyaltyCardLevel, LoyaltyCardLevel.SILVER.name()) || Objects.equals(loyaltyCardLevel, LoyaltyCardLevel.GOLD.name())) {
+            this.loyaltyCardLevel = loyaltyCardLevel;
+        } else {
+            throw new IllegalArgumentException("Invalid loyalty card level value");
+        }
+    }
+
+    private int getDiscountFromLoyaltyCard(){
+        switch (loyaltyCardLevel) {
+            case "STANDARD" -> {
+                return 2;
+            }
+            case "SILVER" -> {
+                return 5;
+            }
+            case "GOLD" -> {
+                return 7;
+            }
+            default -> {
+                return 0;
+            }
+        }
+    }
+
+    @Override
+    public int calculateDiscount() {
+        return getMembershipAge() + getDiscountFromLoyaltyCard();
     }
 
     @Override

@@ -6,13 +6,12 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "specialization")
 public class Specialization {
-    enum CategorySpecialization{
-        assembly, conservation
-    }
+    enum CategorySpecialization{Assembly, Conservation}
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
@@ -53,7 +52,11 @@ public class Specialization {
     }
 
     public void setCategory(String category) {
-        this.category = category;
+        if (Objects.equals(category, CategorySpecialization.Conservation.name()) || Objects.equals(category, CategorySpecialization.Assembly.name())) {
+            this.category = category;
+        } else {
+            throw new IllegalArgumentException("Invalid contact preference value");
+        }
     }
 
     public void setLicenses(List<License> licenses) {

@@ -17,14 +17,12 @@ public class Material {
     private long id;
     private int price;
 
-
     @ManyToMany()
     @JoinTable(
             name = "assemblymaterial",
             joinColumns = @JoinColumn(name = "idM"),
             inverseJoinColumns = @JoinColumn(name = "idA")
     )
-
 
     private List<Assembly> assemblyList = new ArrayList<>();
     public Material(){}

@@ -28,12 +28,11 @@ public class Chemical {
 
     public Chemical(){}
 
-    public Chemical(long id, String name, int toxicityLevel, int price, List<Conservation> conservationList){
+    public Chemical(long id, String name, int toxicityLevel, int price){
         this.id = id;
         this.name = name;
         this.toxicityLevel = toxicityLevel;
         this.price = price;
-        setConservationList(conservationList);
     }
 
     public long getId() {
@@ -57,7 +56,11 @@ public class Chemical {
     }
 
     public void setToxicityLevel(int toxicityLevel) {
-        this.toxicityLevel = toxicityLevel;
+        if (toxicityLevel >= 1 && toxicityLevel <=5) {
+            this.toxicityLevel = toxicityLevel;
+        } else {
+            throw new IllegalArgumentException("Invalid toxicity level value");
+        }
     }
 
     public int getPrice() {
@@ -68,11 +71,26 @@ public class Chemical {
         this.price = price;
     }
 
-    public List<Conservation> getConservationList() {
-        return conservationList;
+    public void addConservation(Conservation newConservation){
+        if(!conservationList.contains(newConservation)) {
+            conservationList.add(newConservation);
+        }
     }
 
-    public void setConservationList(List<Conservation> conservationList) {
-        this.conservationList = conservationList;
+    public void removeConservation(Conservation conservation){
+        if(!conservationList.contains(conservation)) {
+            conservationList.remove(conservation);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Chemical{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", toxicityLevel=" + toxicityLevel +
+                ", price=" + price +
+                ", conservationList=" + conservationList +
+                '}';
     }
 }

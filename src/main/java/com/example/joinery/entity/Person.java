@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 
 @Entity
 @Table(name = "person")
@@ -24,11 +25,9 @@ public class Person{
 
     public Person() {}
 
-
     public long getId() {
         return id;
     }
-
 
     public void setId(long id) {
         this.id = id;
@@ -56,6 +55,10 @@ public class Person{
 
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public int getAge(){
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
 
     public String toString() {

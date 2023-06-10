@@ -17,7 +17,7 @@ public class WholesaleCustomer extends Customer {
     public WholesaleCustomer(){}
 
     public WholesaleCustomer(Long id, String companyName, String nip, LocalDate dateJoined, String paymentPreference, String contactPreference,
-                             String telephone, String email, List<WorkOrder> workOrders){
+                             String telephone, String email){
         super();
         setIdC(id);
         setDateJoined(dateJoined);
@@ -25,7 +25,6 @@ public class WholesaleCustomer extends Customer {
         setContactPreference(contactPreference);
         setTelephone(telephone);
         setEmail(email);
-        setWorkOrders(workOrders);
 
         this.companyName = companyName;
         this.nip = nip;
@@ -45,6 +44,11 @@ public class WholesaleCustomer extends Customer {
 
     public void setNip(String nip) {
         this.nip = nip;
+    }
+
+    @Override
+    public int calculateDiscount() {
+        return getMembershipAge() + FIXED_BUSINESS_DISCOUNT;
     }
 
     @Override

@@ -17,17 +17,15 @@ public class Assembly extends Service {
             joinColumns = @JoinColumn(name = "idA"),
             inverseJoinColumns = @JoinColumn(name = "idM")
     )
-    private List<Material> materials = new ArrayList<>();
+    private List<Material> materialList = new ArrayList<>();
 
     public Assembly() {}
 
-    public Assembly(long id, String productName, int dayToComplete, int costPerDay, List<Material> materials, List<WorkOrder> workOrders) {
+    public Assembly(long id, String productName, int dayToComplete, int costPerDay) {
         super();
         setId(id);
         setDaysToComplete(dayToComplete);
         setCostPerDay(costPerDay);
-        setMaterials(materials);
-        setWorkOrders(workOrders);
 
         this.productName = productName;
     }
@@ -42,17 +40,29 @@ public class Assembly extends Service {
 
 
     public List<Long> getMaterialsId() {
-        return materials.stream().map(Material::getId).collect(Collectors.toList());
+        return materialList.stream().map(Material::getId).collect(Collectors.toList());
     }
 
     public List<Material> getMaterials() {
-        return materials;
+        return materialList;
     }
 
-    public void setMaterials(List<Material> materials) {
-        this.materials = materials;
+    public void addMaterial(Material newMaterial){
+        if(!materialList.contains(newMaterial)) {
+            materialList.add(newMaterial);
+        }
     }
 
+    public void removeMaterial(Material material){
+        if(!materialList.contains(material)) {
+            materialList.remove(material);
+        }
+    }
+
+    @Override
+    public int calculateServicePrice() {
+        return getCostPerDay() * getDaysToComplete() + materialList.stream().mapToInt(m -> m.getPrice()).sum();
+    }
 
     @Override
     public String toString() {

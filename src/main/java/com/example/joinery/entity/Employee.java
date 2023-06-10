@@ -5,6 +5,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +68,10 @@ public class Employee extends Person {
 
     public void setWorkOrders(List<WorkOrder> workOrders) {
         this.workOrders = workOrders;
+    }
+
+    public int getTenure(){
+        return Period.between(employmentDate, LocalDate.now()).getYears();
     }
 
     @Override

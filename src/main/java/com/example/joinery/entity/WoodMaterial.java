@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "woodMaterial")
@@ -14,11 +15,10 @@ public class WoodMaterial extends Material{
 
     public WoodMaterial(){}
 
-    public WoodMaterial(long id, String woodType, int hardness, int price, List<Assembly> assemblyList){
+    public WoodMaterial(long id, String woodType, int hardness, int price){
         super();
         setId(id);
         setPrice(price);
-        setAssemblyList(assemblyList);
 
         this.woodType = woodType;
         this.hardness = hardness;
@@ -37,7 +37,11 @@ public class WoodMaterial extends Material{
     }
 
     public void setHardness(int hardness) {
-        this.hardness = hardness;
+        if (hardness >= 1 && hardness <=6) {
+            this.hardness = hardness;
+        } else {
+            throw new IllegalArgumentException("Invalid hardness value");
+        }
     }
 
     @Override

@@ -14,11 +14,10 @@ public class WoodLikeMaterial extends Material{
 
     public WoodLikeMaterial(){}
 
-    public WoodLikeMaterial(long id, String material, String manufacturer, int price, List<Assembly> assemblyList){
+    public WoodLikeMaterial(long id, String material, String manufacturer, int price){
         super();
         setId(id);
         setPrice(price);
-        setAssemblyList(assemblyList);
 
         this.material = material;
         this.manufacturer = manufacturer;

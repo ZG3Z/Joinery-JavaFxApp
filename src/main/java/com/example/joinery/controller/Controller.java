@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class Controller {
     ObservableList<Chemical> chemicals = FXCollections.observableArrayList();
     ObservableList<Specialization> specializations = FXCollections.observableArrayList();
     ObservableList<Employee> employees = FXCollections.observableArrayList();
+    ObservableList<WorkOrder> workOrders = FXCollections.observableArrayList();
     private long selectedCustomerId;
     private long selectedServiceId;
     private List<Pair<Long, Integer>> selectedAssociated = new ArrayList<>();
@@ -115,7 +117,7 @@ public class Controller {
 
                 selectedAssociated.clear();
                 selectedAssociates.getItems().clear();
-                saveService.setVisible(false);
+                saveService.setVisible(true);
 
                 materialText.setVisible(true);
                 materialChoiceBox.setVisible(true);
@@ -136,6 +138,7 @@ public class Controller {
 
                 selectedAssociated.clear();
                 selectedAssociates.getItems().clear();
+                saveService.setVisible(true);
             }
         });
 
@@ -157,7 +160,7 @@ public class Controller {
                                 selectedAssociates.getItems().add(selectedMaterial.getWoodType());
                             }
 
-                            saveService.setVisible(true);
+                          //  saveService.setVisible(true);
                         }
                         case "Wood like material" -> {
                             WoodLikeMaterial selectedMaterial = (WoodLikeMaterial) tableViewMaterial.getSelectionModel().getSelectedItem();
@@ -172,7 +175,7 @@ public class Controller {
                                 selectedAssociates.getItems().add(selectedMaterial.getMaterial());
                             }
 
-                            saveService.setVisible(true);
+                         //   saveService.setVisible(true);
                         }
                     }
                 }
@@ -190,7 +193,7 @@ public class Controller {
                     selectedAssociates.getItems().add(chemical.getName());
                 }
 
-                saveService.setVisible(true);
+               // saveService.setVisible(true);
             }
         });
 
@@ -270,6 +273,7 @@ public class Controller {
                 loadTable(List.of("Product name", "Days to complete", "Cost per day"), tableViewService, assemblyServices);
                 tableViewService.setVisible(true);
                 tableViewMaterial.setVisible(false);
+                saveService.setVisible(false);
             }
             case "Conservation" -> {
                 materialText.setVisible(false);
@@ -277,6 +281,7 @@ public class Controller {
                 loadTable(List.of("Level of damage", "Days to complete", "Cost per day"), tableViewService, conservationServices);
                 tableViewMaterial.setVisible(false);
                 tableViewService.setVisible(true);
+                saveService.setVisible(false);
             }
         }
     }
@@ -330,6 +335,7 @@ public class Controller {
 
         selectedAssociates.setDisable(false);
         removeAssociate.setVisible(true);
+        saveService.setVisible(true);
     }
     @FXML
     private void removeAssociate(){
@@ -355,13 +361,77 @@ public class Controller {
 
         serviceChoiceBox.setDisable(true);
         specializationChoiceBox.setDisable(false);
-        removeAssociate.setVisible(false);
+     //   removeAssociate.setVisible(false);
     }
     @FXML
     private void saveEmployee(){
         saveEmployee.setVisible(false);
         specializationChoiceBox.setDisable(true);
         tableViewEmployee.setDisable(true);
+        show();
+    }
+
+    private void show(){
+        Customer selectedCustomer = retailCustomers.get(0);;
+        Service selectedService = assemblyServices.get(0);
+        Employee selectedEmployee;
+        System.out.println("CUSTOMER: ");
+        switch (customerChoiceBox.getValue().toString()) {
+            case "Retail customer" -> {
+                selectedCustomer = retailCustomers.stream().filter(c -> c.getId() == selectedCustomerId).findFirst().get();
+            }
+            case "Wholesale customer" -> {
+                selectedCustomer = wholesaleCustomers.stream().filter(c -> c.getIdC() == selectedCustomerId).findFirst().get();
+            }
+        }
+        System.out.println("SERVICE: ");
+        switch (serviceChoiceBox.getValue().toString()) {
+            case "Assembly" -> {
+                Assembly assembly = assemblyServices.stream().filter(c -> c.getId() == selectedServiceId).findFirst().get();
+                selectedService = new Assembly(Long.valueOf(assemblyServices.size() + conservationServices.size()),
+                        assembly.getProductName(),
+                        assembly.getDaysToComplete(),
+                        assembly.getCostPerDay());
+            }
+            case "Conservation" -> {
+                Conservation conservation = conservationServices.stream().filter(c -> c.getId() == selectedServiceId).findFirst().get();
+                selectedService = new Conservation(Long.valueOf(assemblyServices.size() + conservationServices.size()),
+                        conservation.getLevelOfDamage(),
+                        conservation.getDaysToComplete(),
+                        conservation.getCostPerDay());
+            }
+        }
+
+        System.out.println("ASSOCIATE: ");
+        for(Pair<Long, Integer> associate : selectedAssociated){
+            switch (serviceChoiceBox.getValue().toString()) {
+                case "Assembly" -> {
+                    if (woodMaterials.stream().anyMatch(material -> material.getId() == associate.getKey())) {
+                        Assembly assembly = (Assembly) selectedService;
+                        assembly.addMaterial(woodMaterials.stream().filter(c -> c.getId() == associate.getKey()).findFirst().get());
+                   } else  if (woodLikeMaterials.stream().anyMatch(material -> material.getId() == associate.getKey())) {
+                        Assembly assembly = (Assembly) selectedService;
+                        assembly.addMaterial(woodLikeMaterials.stream().filter(c -> c.getId() == associate.getKey()).findFirst().get());
+                   }
+                }
+                case "Conservation" -> {
+                    if (chemicals.stream().anyMatch(material -> material.getId() == associate.getKey())) {
+                        Conservation conservation = (Conservation) selectedService;
+                        conservation.addChemical(chemicals.stream().filter(c -> c.getId() == associate.getKey()).findFirst().get());
+                    }
+                }
+            }
+        }
+        System.out.println("EMPLOYEE: ");
+        selectedEmployee = employees.stream().filter(c -> c.getId() == selectedEmployeeId).findFirst().get();
+
+        System.out.println(selectedService);
+        WorkOrder newOrder = new WorkOrder(workOrders.size()+1, LocalDate.now(), selectedCustomer, selectedService, selectedEmployee);
+        System.out.println("ORDER: ");
+        System.out.println(selectedCustomer.calculateDiscount());
+        System.out.println(selectedService.calculateServicePrice());
+        System.out.println(newOrder);
+        System.out.println(newOrder.getTotalPrice());
     }
     private void loadDataCustomer(){
         session  = sessionFactory.openSession();
@@ -383,8 +453,7 @@ public class Controller {
                         customer.getContactPreference(),
                         customer.getTelephone(),
                         customer.getEmail(),
-                        customer.getLoyaltyCardLevel(),
-                        customer.getWorkOrders()
+                        customer.getLoyaltyCardLevel()
                 ));
             }
 
@@ -397,8 +466,7 @@ public class Controller {
                         customer.getPaymentPreference(),
                         customer.getContactPreference(),
                         customer.getTelephone(),
-                        customer.getEmail(),
-                        customer.getWorkOrders()
+                        customer.getEmail()
                 ));
             }
 
@@ -418,15 +486,12 @@ public class Controller {
             List<WoodLikeMaterial> wlMaterial = session.createQuery("FROM WoodLikeMaterial ", WoodLikeMaterial.class).getResultList();
             List<Chemical> chemicals = session.createQuery("FROM Chemical ", Chemical.class).getResultList();
 
-
             for(Assembly service : aServices){
                 this.assemblyServices.add(new Assembly(
                         service.getId(),
                         service.getProductName(),
                         service.getDaysToComplete(),
-                        service.getCostPerDay(),
-                        service.getMaterials(),
-                        service.getWorkOrders()
+                        service.getCostPerDay()
                 ));
             }
 
@@ -435,9 +500,7 @@ public class Controller {
                         service.getId(),
                         service.getLevelOfDamage(),
                         service.getDaysToComplete(),
-                        service.getCostPerDay(),
-                        service.getChemicalList(),
-                        service.getWorkOrders()
+                        service.getCostPerDay()
                 ));
             }
 
@@ -446,8 +509,7 @@ public class Controller {
                         material.getId(),
                         material.getWoodType(),
                         material.getHardness(),
-                        material.getPrice(),
-                        material.getAssemblyList()
+                        material.getPrice()
                 ));
             }
 
@@ -456,8 +518,7 @@ public class Controller {
                         material.getId(),
                         material.getMaterial(),
                         material.getManufacturer(),
-                        material.getPrice(),
-                        material.getAssemblyList()
+                        material.getPrice()
                 ));
             }
 
@@ -466,8 +527,7 @@ public class Controller {
                         chemical.getId(),
                         chemical.getName(),
                         chemical.getToxicityLevel(),
-                        chemical.getPrice(),
-                        chemical.getConservationList()
+                        chemical.getPrice()
                 ));
             }
 
@@ -483,6 +543,7 @@ public class Controller {
 
             List<Specialization> specializations = session.createQuery("FROM Specialization ", Specialization.class).getResultList();
             List<Employee> employees = session.createQuery("FROM Employee ", Employee.class).getResultList();
+            List<WorkOrder> workOrders = session.createQuery("FROM WorkOrder", WorkOrder.class).getResultList();
 
             for(Specialization specialization : specializations){
                 this.specializations.add(new Specialization(
@@ -503,6 +564,17 @@ public class Controller {
                         employee.getLicenses()
                 ));
             }
+
+            for(WorkOrder order : workOrders) {
+                this.workOrders.add(new WorkOrder(
+                        order.getId(),
+                        order.getDate(),
+                        order.getCustomer(),
+                        order.getService(),
+                        order.getEmployee()
+                ));
+            }
+
             session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
