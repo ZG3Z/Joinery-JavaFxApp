@@ -13,15 +13,21 @@ public class WorkOrder {
     @GenericGenerator(name="increment", strategy = "increment")
     private long id;
     private LocalDate date;
+    @Column(name = "idCustomer")
+    private long idCustomer;
+    @Column(name = "idService")
+    private long idService;
+    @Column(name = "idEmployee")
+    private long idEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "idC", referencedColumnName = "idC", insertable = false, updatable = false)
+    @JoinColumn(name = "idCustomer", referencedColumnName = "idC", insertable = false, updatable = false)
     private Customer customer;
     @ManyToOne
-    @JoinColumn(name = "idS", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "idService", referencedColumnName = "id", insertable = false, updatable = false)
     private Service service;
     @ManyToOne
-    @JoinColumn(name = "idE", referencedColumnName = "idE", insertable = false, updatable = false)
+    @JoinColumn(name = "idEmployee", referencedColumnName = "idE", insertable = false, updatable = false)
     private Employee employee;
 
     public WorkOrder(){}
@@ -50,11 +56,36 @@ public class WorkOrder {
         this.date = date;
     }
 
+    public long getIdCustomer() {
+        return idCustomer;
+    }
+
+    public void setIdCustomer(long idCustomer) {
+        this.idCustomer = idCustomer;
+    }
+
+    public long getIdService() {
+        return idService;
+    }
+
+    public void setIdService(long idService) {
+        this.idService = idService;
+    }
+
+    public long getIdEmployee() {
+        return idEmployee;
+    }
+
+    public void setIdEmployee(long idEmployee) {
+        this.idEmployee = idEmployee;
+    }
+
     public Customer getCustomer() {
         return customer;
     }
 
     public void setCustomer(Customer customer) {
+        idCustomer = customer.getIdC();
         this.customer = customer;
     }
 
@@ -63,6 +94,7 @@ public class WorkOrder {
     }
 
     public void setService(Service service) {
+        idService = service.getId();
         this.service = service;
     }
 
@@ -71,6 +103,7 @@ public class WorkOrder {
     }
 
     public void setEmployee(Employee employee) {
+        idEmployee = employee.getId();
         this.employee = employee;
     }
     public float getTotalPrice(){
@@ -78,12 +111,9 @@ public class WorkOrder {
     }
     @Override
     public String toString() {
-        return "WorkOrder{" +
-                "id=" + id +
-                ", date=" + date +
-                ", customer=" + customer +
-                ", service=" + service +
-                ", employee=" + employee +
-                '}';
+        return "ORDER: \n" +
+                "\tCustomer - " + getCustomer().toString()
+                + "\n\tService - " + getService().toString()
+                + "\n\tEmployee - " + getEmployee().toString();
     }
 }

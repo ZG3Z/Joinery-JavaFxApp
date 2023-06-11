@@ -24,11 +24,10 @@ public class Specialization {
 
     public Specialization(){}
 
-    public Specialization(long id, String name, String category, List<License> licenses){
+    public Specialization(long id, String name, String category){
         this.id = id;
         this.name = name;
         this.category = category;
-        setLicenses(licenses);
     }
 
     public long getId() {

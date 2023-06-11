@@ -99,13 +99,4 @@ public abstract class Customer {
     }
 
     public abstract int calculateDiscount();
-
-    @Override
-    public String toString() {
-        return "date joined: " + getDateJoined()
-                + " payment preference:  " + getPaymentPreference()
-                + " contact preference: " + getContactPreference()
-                + " telephone: " + getTelephone()
-                + " email: " + getEmail();
-    }
 }

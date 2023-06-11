@@ -54,9 +54,4 @@ public abstract class Service {
     }
 
     public abstract int calculateServicePrice();
-    @Override
-    public String toString() {
-        return " daysToComplete: " + getDaysToComplete() +
-                ", costPerDay: " + getCostPerDay();
-    }
 }

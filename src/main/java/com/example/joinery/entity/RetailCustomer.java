@@ -106,9 +106,6 @@ public class RetailCustomer extends Customer {
 
     @Override
     public String toString() {
-        return "Retail customer: " +
-                person.toString() +
-                super.toString() +
-                ", loyaltyCardLevel: " + getLoyaltyCardLevel();
+        return person.toString();
     }
 }

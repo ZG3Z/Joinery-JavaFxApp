@@ -24,14 +24,13 @@ public class Employee extends Person {
 
     public Employee() {}
 
-    public Employee(Long id, String firstName, String lastName, LocalDate dateOfBirth, LocalDate employmentDate, List<License> licenses) {
+    public Employee(Long id, String firstName, String lastName, LocalDate dateOfBirth, LocalDate employmentDate) {
         super();
         setId(id);
         setFirstName(firstName);
         setLastName(lastName);
         setDateOfBirth(dateOfBirth);
         this.employmentDate = employmentDate;
-        setLicenses(licenses);
     }
 
     public LocalDate getEmploymentDate() {
@@ -76,9 +75,7 @@ public class Employee extends Person {
 
     @Override
     public String toString() {
-        return "Employee: " +
-                super.toString() +
-                ", employment date: " + getEmploymentDate();
+        return super.toString();
     }
 }
 

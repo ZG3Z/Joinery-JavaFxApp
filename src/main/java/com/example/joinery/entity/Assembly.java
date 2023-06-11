@@ -66,6 +66,6 @@ public class Assembly extends Service {
 
     @Override
     public String toString() {
-        return "Assembly: " + " product name: " + getProductName() + super.toString();
+        return "Assembly (" + getProductName() + ") ";
     }
 }

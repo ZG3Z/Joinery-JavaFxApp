@@ -30,13 +30,10 @@ public class License {
 
     public License(){}
 
-    public License(long idS, long idE, LocalDate dateOfIssue, Specialization specialization, Employee employee){
+    public License(long idS, long idE, LocalDate dateOfIssue){
         this.idS = idS;
         this.idE = idE;
         this.dateOfIssue = dateOfIssue;
-
-        this.specialization.addLicense(this);
-        this.employee.addLicense(this);
     }
 
     public Long getIdS() {

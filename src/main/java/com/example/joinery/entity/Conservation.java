@@ -79,6 +79,6 @@ public class Conservation extends Service {
 
     @Override
     public String toString() {
-        return "Conservation: " + " level of damage: " + getLevelOfDamage() + super.toString();
+        return "Conservation";
     }
 }

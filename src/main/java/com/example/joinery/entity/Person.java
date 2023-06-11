@@ -62,6 +62,6 @@ public class Person{
     }
 
     public String toString() {
-        return "first name: " + getFirstName() + " last name:  " + getLastName() + " dateOfBirth: " +getDateOfBirth();
+        return getFirstName() + " " + getLastName();
     }
 }

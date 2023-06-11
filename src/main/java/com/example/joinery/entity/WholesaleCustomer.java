@@ -53,8 +53,7 @@ public class WholesaleCustomer extends Customer {
 
     @Override
     public String toString() {
-        return "Wholesale customer: " + ", company name: " + getCompanyName()
-                + " nip: " + getNip() + super.toString();
+        return getCompanyName();
 
     }
 }
