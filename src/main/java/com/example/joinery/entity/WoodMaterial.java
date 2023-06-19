@@ -1,5 +1,6 @@
 package com.example.joinery.entity;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -10,7 +11,9 @@ import java.util.Objects;
 @Table(name = "woodMaterial")
 @PrimaryKeyJoinColumn(name = "idW")
 public class WoodMaterial extends Material{
+    @Basic
     private String woodType;
+    @Basic
     private int hardness;
 
     public WoodMaterial(){}
@@ -20,8 +23,8 @@ public class WoodMaterial extends Material{
         setId(id);
         setPrice(price);
 
-        this.woodType = woodType;
-        this.hardness = hardness;
+        setWoodType(woodType);
+        setHardness(hardness);
     }
 
     public String getWoodType() {
@@ -42,12 +45,5 @@ public class WoodMaterial extends Material{
         } else {
             throw new IllegalArgumentException("Invalid hardness value");
         }
-    }
-
-    @Override
-    public String toString() {
-        return "WoodMaterial: " +
-                " woodType: " + getWoodType()  +
-                ", hardness: " + getHardness() +  super.toString();
     }
 }

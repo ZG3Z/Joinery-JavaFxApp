@@ -5,28 +5,39 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "customer")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Customer {
-    enum PaymentPreference {cash, card}
-    enum ContactPreference {telephone, email}
+    public enum PaymentPreference {cash, card}
+    public enum ContactPreference {telephone, email}
 
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private long idC;
+
+    @Basic
     private LocalDate dateJoined;
-    private String paymentPreference;
-    private String contactPreference;
+
+    @Enumerated(value = EnumType.STRING)
+    private PaymentPreference paymentPreference;
+
+    @Enumerated(value = EnumType.STRING)
+    private ContactPreference contactPreference;
+
+    @Basic
     private String telephone;
+
+    @Basic
     private String email;
 
-    @OneToMany(mappedBy = "customer")
-    private List<WorkOrder> workOrders;
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKeyColumn(name = "id")
+    private Map<Long, ServiceOrder> serviceOrders = new HashMap<>();
 
     public Customer(){}
 
@@ -46,28 +57,23 @@ public abstract class Customer {
         this.dateJoined = dateJoined;
     }
 
-    public String getPaymentPreference() {
+    @Transient
+    public int getMembershipAge(){return Period.between(dateJoined, LocalDate.now()).getYears();}
+
+    public PaymentPreference getPaymentPreference() {
         return paymentPreference;
     }
 
-    public void setPaymentPreference(String paymentPreference) {
-        if (Objects.equals(paymentPreference, PaymentPreference.card.name()) || Objects.equals(paymentPreference, PaymentPreference.cash.name())) {
-            this.paymentPreference = paymentPreference;
-        } else {
-            throw new IllegalArgumentException("Invalid payment preference value");
-        }
+    public void setPaymentPreference(PaymentPreference paymentPreference) {
+        this.paymentPreference = paymentPreference;
     }
 
-    public String getContactPreference() {
+    public ContactPreference getContactPreference() {
         return contactPreference;
     }
 
-    public void setContactPreference(String contactPreference) {
-        if (Objects.equals(contactPreference, ContactPreference.telephone.name()) || Objects.equals(contactPreference, ContactPreference.email.name())) {
-            this.contactPreference = contactPreference;
-        } else {
-            throw new IllegalArgumentException("Invalid contact preference value");
-        }
+    public void setContactPreference(ContactPreference contactPreference) {
+        this.contactPreference = contactPreference;
     }
 
     public String getTelephone() {
@@ -86,17 +92,28 @@ public abstract class Customer {
         this.email = email;
     }
 
-    public List<WorkOrder> getWorkOrders() {
-        return workOrders;
+    public Map<Long, ServiceOrder> getServiceOrders() {
+        return serviceOrders;
     }
 
-    public void setWorkOrders(List<WorkOrder> workOrders) {
-        this.workOrders = workOrders;
+    public void addServiceOrder(ServiceOrder newServiceOrder){
+        if(!serviceOrders.containsKey(newServiceOrder.getId())){
+            serviceOrders.put(newServiceOrder.getId(), newServiceOrder);
+            newServiceOrder.addCustomer(this);
+        }
     }
 
-    public int getMembershipAge(){
-        return Period.between(dateJoined, LocalDate.now()).getYears();
+    public void removeServiceOrder(ServiceOrder serviceOrder){
+        if(serviceOrders.containsKey(serviceOrder.getId())){
+            serviceOrders.remove(serviceOrder.getId());
+            serviceOrder.removeCustomer();
+        }
     }
 
-    public abstract int calculateDiscount();
+    public void setServiceOrders(Map<Long, ServiceOrder> serviceOrders) {
+        this.serviceOrders = serviceOrders;
+    }
+
+    @Transient
+    public abstract int getDiscount();
 }

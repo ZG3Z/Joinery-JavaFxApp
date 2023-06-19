@@ -3,8 +3,8 @@ package com.example.joinery.entity;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "wholesaleCustomer")
@@ -13,10 +13,10 @@ public class WholesaleCustomer extends Customer {
     private String companyName;
     private String nip;
     private static int FIXED_BUSINESS_DISCOUNT = 5;
-
     public WholesaleCustomer(){}
 
-    public WholesaleCustomer(Long id, String companyName, String nip, LocalDate dateJoined, String paymentPreference, String contactPreference,
+    public WholesaleCustomer(Long id, String companyName, String nip,
+                             LocalDate dateJoined, PaymentPreference paymentPreference, ContactPreference contactPreference,
                              String telephone, String email){
         super();
         setIdC(id);
@@ -26,8 +26,8 @@ public class WholesaleCustomer extends Customer {
         setTelephone(telephone);
         setEmail(email);
 
-        this.companyName = companyName;
-        this.nip = nip;
+        setCompanyName(companyName);
+        setNip(nip);
     }
 
     public String getCompanyName() {
@@ -46,14 +46,9 @@ public class WholesaleCustomer extends Customer {
         this.nip = nip;
     }
 
+    @Transient
     @Override
-    public int calculateDiscount() {
+    public int getDiscount() {
         return getMembershipAge() + FIXED_BUSINESS_DISCOUNT;
-    }
-
-    @Override
-    public String toString() {
-        return getCompanyName();
-
     }
 }

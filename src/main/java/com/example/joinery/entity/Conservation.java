@@ -1,18 +1,17 @@
 package com.example.joinery.entity;
 
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "conservation")
 @PrimaryKeyJoinColumn(name = "idC")
 public class Conservation extends Service {
-    enum LevelOfDamage{high, low}
-    private String levelOfDamage;
+    public enum LevelOfDamage {high, low}
+
+    @Enumerated(EnumType.STRING)
+    private LevelOfDamage levelOfDamage;
 
     @ManyToMany()
     @JoinTable(
@@ -22,35 +21,22 @@ public class Conservation extends Service {
     )
     private List<Chemical> chemicalList = new ArrayList<>();
 
-
     public Conservation(){}
 
-
-    public Conservation(long id, String levelOfDamage, int dayToComplete, int costPerDay) {
+    public Conservation(long id, LevelOfDamage levelOfDamage) {
         super();
         setId(id);
-        setDaysToComplete(dayToComplete);
-        setCostPerDay(costPerDay);
-      //  setChemicalList(chemicalList);
-     //   setWorkOrders(workOrders);
+        setCostPerDay(200);
 
-        this.levelOfDamage = levelOfDamage;
+        setLevelOfDamage(levelOfDamage);
     }
 
-    public String getLevelOfDamage() {
+    public LevelOfDamage getLevelOfDamage() {
         return levelOfDamage;
     }
 
-    public void setLevelOfDamage(String levelOfDamage) {
-        if (Objects.equals(levelOfDamage, LevelOfDamage.high.name()) || Objects.equals(levelOfDamage, LevelOfDamage.low.name())) {
-            this.levelOfDamage = levelOfDamage;
-        } else {
-            throw new IllegalArgumentException("Invalid level of damage value");
-        }
-    }
-
-    public List<Long> getChemicalId() {
-        return chemicalList.stream().map(Chemical::getId).collect(Collectors.toList());
+    public void setLevelOfDamage(LevelOfDamage levelOfDamage) {
+        this.levelOfDamage = levelOfDamage;
     }
 
     public List<Chemical> getChemicalList() {
@@ -60,25 +46,32 @@ public class Conservation extends Service {
     public void addChemical(Chemical newChemical){
         if(!chemicalList.contains(newChemical)) {
             chemicalList.add(newChemical);
+            newChemical.addConservation(this);
         }
     }
 
     public void removeChemical(Chemical chemical){
-        if(!chemicalList.contains(chemical)) {
+        if(chemicalList.contains(chemical)) {
             chemicalList.remove(chemical);
+            chemical.removeConservation(this);
         }
     }
 
-    @Override
-    public int calculateServicePrice() {
-        System.out.println(chemicalList.stream().mapToInt(c -> c.getPrice()).toArray());
-        System.out.println(chemicalList.size());
-        getChemicalList();
-        return getCostPerDay() * getDaysToComplete() + chemicalList.stream().mapToInt(c -> c.getPrice()).sum();
+    public void setChemicalList(List<Chemical> chemicalList) {
+        this.chemicalList = chemicalList;
     }
 
+    @Transient
     @Override
-    public String toString() {
-        return "Conservation";
+    public int getDaysToComplete() {
+        int sizeLevelOfDamage = LevelOfDamage.high.equals(levelOfDamage)? 10 : LevelOfDamage.low.equals(levelOfDamage)? 5: 0;
+
+        return chemicalList.size() + sizeLevelOfDamage;
+    }
+
+    @Transient
+    @Override
+    public int getTotalServiceCost() {
+        return getCostPerDay() * getDaysToComplete() + chemicalList.stream().mapToInt(Chemical::getPrice).sum();
     }
 }

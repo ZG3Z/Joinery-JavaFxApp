@@ -9,8 +9,10 @@ import java.util.stream.Collectors;
 @Table(name = "assembly")
 @PrimaryKeyJoinColumn(name = "idA")
 public class Assembly extends Service {
+    @Basic
     private String productName;
-
+    @Basic
+    private int size;
     @ManyToMany()
     @JoinTable(
             name = "assemblymaterial",
@@ -21,13 +23,13 @@ public class Assembly extends Service {
 
     public Assembly() {}
 
-    public Assembly(long id, String productName, int dayToComplete, int costPerDay) {
+    public Assembly(long id, String productName, int size) {
         super();
         setId(id);
-        setDaysToComplete(dayToComplete);
-        setCostPerDay(costPerDay);
+        setCostPerDay(100);
 
-        this.productName = productName;
+        setProductName(productName);
+        setSize(size);
     }
 
     public String getProductName() {
@@ -38,9 +40,16 @@ public class Assembly extends Service {
         this.productName = productName;
     }
 
+    public int getSize() {
+        return size;
+    }
 
-    public List<Long> getMaterialsId() {
-        return materialList.stream().map(Material::getId).collect(Collectors.toList());
+    public void setSize(int size) {
+        if (size >= 1 && size <= 10) {
+            this.size = size;
+        } else {
+            throw new IllegalArgumentException("Invalid size value");
+        }
     }
 
     public List<Material> getMaterials() {
@@ -50,22 +59,30 @@ public class Assembly extends Service {
     public void addMaterial(Material newMaterial){
         if(!materialList.contains(newMaterial)) {
             materialList.add(newMaterial);
+            newMaterial.addAssembly(this);
         }
     }
 
     public void removeMaterial(Material material){
-        if(!materialList.contains(material)) {
+        if(materialList.contains(material)) {
             materialList.remove(material);
+            material.removeAssembly(this);
         }
     }
 
-    @Override
-    public int calculateServicePrice() {
-        return getCostPerDay() * getDaysToComplete() + materialList.stream().mapToInt(m -> m.getPrice()).sum();
+    public void setMaterialList(List<Material> materialList) {
+        this.materialList = materialList;
     }
 
+    @Transient
     @Override
-    public String toString() {
-        return "Assembly (" + getProductName() + ") ";
+    public int getDaysToComplete() {
+        return size + materialList.size();
+    }
+
+    @Transient
+    @Override
+    public int getTotalServiceCost() {
+        return getCostPerDay() * getDaysToComplete() + materialList.stream().mapToInt(m -> m.getPrice()).sum();
     }
 }

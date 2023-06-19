@@ -1,9 +1,6 @@
 package com.example.joinery.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -13,14 +10,14 @@ import java.util.List;
 @Table(name = "employee")
 @PrimaryKeyJoinColumn(name = "idE")
 public class Employee extends Person {
-
+    @Basic
     private LocalDate employmentDate;
 
-    @OneToMany(mappedBy = "idE")
+    @OneToMany(mappedBy = "idE", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<License> licenses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee")
-    private List<WorkOrder> workOrders = new ArrayList<>();
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.MERGE, orphanRemoval = true)
+    private List<ServiceOrder> serviceOrders = new ArrayList<>();
 
     public Employee() {}
 
@@ -30,7 +27,8 @@ public class Employee extends Person {
         setFirstName(firstName);
         setLastName(lastName);
         setDateOfBirth(dateOfBirth);
-        this.employmentDate = employmentDate;
+
+        setEmploymentDate(employmentDate);
     }
 
     public LocalDate getEmploymentDate() {
@@ -39,6 +37,10 @@ public class Employee extends Person {
 
     public void setEmploymentDate(LocalDate employmentDate) {
         this.employmentDate = employmentDate;
+    }
+
+    public List<License> getLicenses() {
+        return licenses;
     }
 
     public void addLicense(License newLicense){
@@ -53,29 +55,35 @@ public class Employee extends Person {
         }
     }
 
-    public List<License> getLicenses() {
-        return licenses;
-    }
-
     public void setLicenses(List<License> licenses) {
         this.licenses = licenses;
     }
 
-    public List<WorkOrder> getWorkOrders() {
-        return workOrders;
+    public List<ServiceOrder> getWorkOrders() {
+        return serviceOrders;
     }
 
-    public void setWorkOrders(List<WorkOrder> workOrders) {
-        this.workOrders = workOrders;
+    public void addServiceOrder(ServiceOrder newServiceOrder) {
+        if (!serviceOrders.contains(newServiceOrder)){
+            serviceOrders.add(newServiceOrder);
+            newServiceOrder.addEmployee(this);
+        }
     }
 
+    public void removeServiceOrder(ServiceOrder serviceOrder){
+        if (serviceOrders.contains(serviceOrder)){
+            serviceOrders.remove(serviceOrder);
+            serviceOrder.removeEmployee();
+        }
+    }
+
+    public void setWorkOrders(List<ServiceOrder> serviceOrders) {
+        this.serviceOrders = serviceOrders;
+    }
+
+    @Transient
     public int getTenure(){
         return Period.between(employmentDate, LocalDate.now()).getYears();
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
     }
 }
 

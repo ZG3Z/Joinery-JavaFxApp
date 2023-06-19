@@ -16,6 +16,7 @@ public class License {
     @Column(name = "idE")
     private Long idE;
 
+    @Basic
     private LocalDate dateOfIssue;
 
     private static int VALIDITY_IN_YEARS = 5;
@@ -31,9 +32,9 @@ public class License {
     public License(){}
 
     public License(long idS, long idE, LocalDate dateOfIssue){
-        this.idS = idS;
-        this.idE = idE;
-        this.dateOfIssue = dateOfIssue;
+        setIdS(idS);
+        setIdE(idE);
+        setDateOfIssue(dateOfIssue);
     }
 
     public Long getIdS() {
@@ -79,16 +80,5 @@ public class License {
     public void removeLicense(){
         employee.removeLicense(this);
         specialization.removeLicense(this);
-    }
-
-    @Override
-    public String toString() {
-        return "License{" +
-                "idS=" + idS +
-                ", idE=" + idE +
-                ", dateOfIssue=" + dateOfIssue +
-                ", specialization=" + specialization.getId() +
-                ", employee=" + employee.getId() +
-                '}';
     }
 }

@@ -10,11 +10,10 @@ import java.io.IOException;
 public class JoineryApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(JoineryApplication.class.getResource("scene1.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(JoineryApplication.class.getResource("scene.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 500);
-        stage.setTitle("NEW ORDER");
+        stage.setTitle("ENTER A NEW ORDER");
         stage.setScene(scene);
-        stage.setResizable(false);
         stage.show();
     }
 

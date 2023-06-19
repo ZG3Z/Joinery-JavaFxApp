@@ -15,6 +15,8 @@ public class Material {
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private long id;
+
+    @Basic
     private int price;
 
     @ManyToMany()
@@ -23,8 +25,8 @@ public class Material {
             joinColumns = @JoinColumn(name = "idM"),
             inverseJoinColumns = @JoinColumn(name = "idA")
     )
-
     private List<Assembly> assemblyList = new ArrayList<>();
+
     public Material(){}
 
     public long getId() {
@@ -47,12 +49,21 @@ public class Material {
         return assemblyList;
     }
 
-    public void setAssemblyList(List<Assembly> assemblyList) {
-        this.assemblyList = assemblyList;
+    public void addAssembly(Assembly newAssembly){
+        if(!assemblyList.contains(newAssembly)) {
+            assemblyList.add(newAssembly);
+            newAssembly.addMaterial(this);
+        }
     }
 
-    @Override
-    public String toString() {
-        return " price: " + getPrice();
+    public void removeAssembly(Assembly assembly){
+        if(assemblyList.contains(assembly)){
+            assemblyList.remove(assembly);
+            assembly.removeMaterial(this);
+        }
+    }
+
+    public void setAssemblyList(List<Assembly> assemblyList) {
+        this.assemblyList = assemblyList;
     }
 }

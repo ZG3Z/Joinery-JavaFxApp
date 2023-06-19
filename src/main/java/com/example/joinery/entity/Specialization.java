@@ -1,33 +1,36 @@
 package com.example.joinery.entity;
 
-import com.example.joinery.entity.License;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "specialization")
 public class Specialization {
-    enum CategorySpecialization{Assembly, Conservation}
+    public enum CategorySpecialization{Assembly, Conservation}
+
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private long id;
-    private String name;
-    private String category;
 
-    @OneToMany(mappedBy = "idS")
+    @Basic
+    private String name;
+
+    @Enumerated(value = EnumType.STRING)
+    private CategorySpecialization category;
+
+    @OneToMany(mappedBy = "idS", cascade = CascadeType.MERGE, orphanRemoval = true)
     private List<License> licenses  = new ArrayList<>();
 
     public Specialization(){}
 
-    public Specialization(long id, String name, String category){
-        this.id = id;
-        this.name = name;
-        this.category = category;
+    public Specialization(long id, String name, CategorySpecialization category){
+        setId(id);
+        setName(name);
+        setCategory(category);
     }
 
     public long getId() {
@@ -46,20 +49,16 @@ public class Specialization {
         this.name = name;
     }
 
-    public String getCategory() {
+    public CategorySpecialization getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        if (Objects.equals(category, CategorySpecialization.Conservation.name()) || Objects.equals(category, CategorySpecialization.Assembly.name())) {
-            this.category = category;
-        } else {
-            throw new IllegalArgumentException("Invalid contact preference value");
-        }
+    public void setCategory(CategorySpecialization category) {
+        this.category = category;
     }
 
-    public void setLicenses(List<License> licenses) {
-        this.licenses = licenses;
+    public List<License> getLicenses() {
+        return licenses;
     }
 
     public void addLicense(License newLicense){
@@ -74,16 +73,7 @@ public class Specialization {
         }
     }
 
-    public List<License> getLicenses() {
-        return licenses;
-    }
-
-    @Override
-    public String toString() {
-        return "Specialization{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", category='" + category + '\'' +
-                '}';
+    public void setLicenses(List<License> licenses) {
+        this.licenses = licenses;
     }
 }

@@ -32,6 +32,6 @@
     <mapping class="com.example.joinery.entity.WoodMaterial"/>
     <mapping class="com.example.joinery.entity.WoodLikeMaterial"/>
     <mapping class="com.example.joinery.entity.Chemical"/>
-    <mapping class="com.example.joinery.entity.WorkOrder"/>
+    <mapping class="com.example.joinery.entity.ServiceOrder"/>
 </session-factory>
 </hibernate-configuration>

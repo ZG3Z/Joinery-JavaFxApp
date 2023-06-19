@@ -1,5 +1,6 @@
 package com.example.joinery.entity;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -9,7 +10,9 @@ import java.util.List;
 @Table(name = "woodLikeMaterial")
 @PrimaryKeyJoinColumn(name = "idWL")
 public class WoodLikeMaterial extends Material{
+    @Basic
     private String material;
+    @Basic
     private String manufacturer;
 
     public WoodLikeMaterial(){}
@@ -19,8 +22,8 @@ public class WoodLikeMaterial extends Material{
         setId(id);
         setPrice(price);
 
-        this.material = material;
-        this.manufacturer = manufacturer;
+        setMaterial(material);
+        setManufacturer(manufacturer);
     }
 
     public String getMaterial() {
@@ -37,12 +40,5 @@ public class WoodLikeMaterial extends Material{
 
     public void setManufacturer(String manufacturer) {
         this.manufacturer = manufacturer;
-    }
-
-    @Override
-    public String toString() {
-        return "WoodLikeMaterial: " +
-                " material: " + getMaterial()  +
-                ", manufacturer: " + getManufacturer() +  super.toString();
     }
 }

@@ -13,11 +13,12 @@ public abstract class Service {
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private long id;
-    private int daysToComplete;
+
+    @Basic
     private int costPerDay;
 
-    @OneToMany(mappedBy = "service")
-    private List<WorkOrder> workOrders;
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceOrder> serviceOrders;
 
     public Service(){}
 
@@ -29,14 +30,6 @@ public abstract class Service {
         this.id = id;
     }
 
-    public int getDaysToComplete() {
-        return daysToComplete;
-    }
-
-    public void setDaysToComplete(int daysToComplete) {
-        this.daysToComplete = daysToComplete;
-    }
-
     public int getCostPerDay() {
         return costPerDay;
     }
@@ -45,13 +38,31 @@ public abstract class Service {
         this.costPerDay = costPerDay;
     }
 
-    public List<WorkOrder> getWorkOrders() {
-        return workOrders;
+    @Transient
+    public abstract int getDaysToComplete();
+
+    @Transient
+    public abstract int getTotalServiceCost();
+
+    public List<ServiceOrder> getWorkOrders() {
+        return serviceOrders;
     }
 
-    public void setWorkOrders(List<WorkOrder> workOrders) {
-        this.workOrders = workOrders;
+    public void addServiceOrder(ServiceOrder newServiceOrder) {
+        if (!serviceOrders.contains(newServiceOrder)){
+            serviceOrders.add(newServiceOrder);
+            newServiceOrder.addService(this);
+        }
     }
 
-    public abstract int calculateServicePrice();
+    public void removeServiceOrder(ServiceOrder serviceOrder){
+        if (serviceOrders.contains(serviceOrder)){
+            serviceOrders.remove(serviceOrder);
+            serviceOrder.removeService();
+        }
+    }
+
+    public void setWorkOrders(List<ServiceOrder> serviceOrders) {
+        this.serviceOrders = serviceOrders;
+    }
 }
