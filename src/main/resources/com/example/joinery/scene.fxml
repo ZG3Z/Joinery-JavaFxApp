@@ -72,7 +72,7 @@
                         <Insets left="15.0" />
                      </GridPane.margin>
                   </Text>
-                  <ChoiceBox fx:id="customerChoiceBox" prefHeight="25.0" prefWidth="150.0" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                  <ChoiceBox fx:id="customerTypeChoiceBox" prefHeight="25.0" prefWidth="150.0" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                      <GridPane.margin>
                         <Insets left="10.0" />
                      </GridPane.margin>
@@ -133,12 +133,12 @@
                         <Insets left="5.0" />
                      </GridPane.margin>
                   </ChoiceBox>
-                  <Button fx:id="saveCustomer" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#saveCustomer" text="Save" textAlignment="CENTER" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <Button fx:id="saveCustomer" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#saveAssignedCustomer" text="Save" textAlignment="CENTER" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="5.0" />
                      </GridPane.margin>
                   </Button>
-                  <Button fx:id="saveService" mnemonicParsing="false" onAction="#saveService" text="Save" visible="false" GridPane.columnIndex="5" GridPane.rowIndex="2">
+                  <Button fx:id="saveService" disable="true" mnemonicParsing="false" onAction="#saveAssignedService" text="Save" visible="false" GridPane.columnIndex="5" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="5.0" />
                      </GridPane.margin>
@@ -179,7 +179,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <TableView fx:id="tableViewElement" onMouseClicked="#tableViewElement" prefHeight="223.0" prefWidth="589.0" visible="false" GridPane.columnIndex="1" />
+                  <TableView fx:id="tableViewElement" onMouseClicked="#selectElement" prefHeight="223.0" prefWidth="589.0" visible="false" GridPane.columnIndex="1" />
                   <GridPane>
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="100.0" />
@@ -202,13 +202,13 @@
                         <Slider fx:id="assemblySizeSlider" blockIncrement="1.0" max="10.0" min="1.0" value="5.0" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                         <ChoiceBox fx:id="conservationLevelOfDamageChoiceBox" prefWidth="150.0" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                         <Text fx:id="conservationLevelOfDamageText" strokeType="OUTSIDE" strokeWidth="0.0" text="LEVEL OF DAMAGE:" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label fx:id="assemblySizeSliderLabel" prefHeight="17.0" prefWidth="25.0" text="5" visible="false" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <Label fx:id="assemblySizeLabel" prefHeight="17.0" prefWidth="25.0" text="5" visible="false" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                      </children>
                   </GridPane>
                </children>
             </GridPane>
-            <TableView fx:id="tableViewCustomer" onMouseClicked="#tableViewCustomer" prefHeight="310.0" prefWidth="1200.0" GridPane.rowIndex="1" />
-            <TableView fx:id="tableViewEmployee" onMouseClicked="#tableViewEmployee" prefHeight="310.0" prefWidth="1200.0" visible="false" GridPane.rowIndex="1" />
+            <TableView fx:id="tableViewCustomer" onMouseClicked="#selectCustomer" prefHeight="310.0" prefWidth="1200.0" GridPane.rowIndex="1" />
+            <TableView fx:id="tableViewEmployee" onMouseClicked="#selectEmployee" prefHeight="310.0" prefWidth="1200.0" visible="false" GridPane.rowIndex="1" />
          </children>
       </GridPane>
       <GridPane fx:id="ordersView" visible="false">
@@ -236,7 +236,7 @@
               </rowConstraints>
                <children>
                   <Button fx:id="returnButton" mnemonicParsing="false" onAction="#returnButton" text="RETURN" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                  <ChoiceBox fx:id="customerChoiceBox2" prefHeight="25.0" prefWidth="584.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <ChoiceBox fx:id="customerChoiceBox" prefHeight="25.0" prefWidth="584.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CUSTOMER:" GridPane.rowIndex="1">
                      <GridPane.margin>
                         <Insets left="30.0" />

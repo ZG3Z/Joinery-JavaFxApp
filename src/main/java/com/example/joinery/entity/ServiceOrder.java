@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Entity
 @Table(name = "serviceOrder")
@@ -29,15 +28,15 @@ public class ServiceOrder {
     private static Map<Long, ServiceOrder> uniqueIds = new HashMap<>();
 
     @ManyToOne
-    @JoinColumn(name = "idCustomer", referencedColumnName = "idC", insertable = false, updatable = false)
+    @JoinColumn(name = "idCustomer", referencedColumnName = "idC")
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "idService", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "idService", referencedColumnName = "id")
     private Service service;
 
     @ManyToOne
-    @JoinColumn(name = "idEmployee", referencedColumnName = "idE", insertable = false, updatable = false)
+    @JoinColumn(name = "idEmployee", referencedColumnName = "idE")
     private Employee employee;
 
     public ServiceOrder(){}
@@ -155,5 +154,17 @@ public class ServiceOrder {
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceOrder{" +
+                "id=" + id +
+                ", date=" + date +
+                ", status=" + status +
+                ", customer=" + customer +
+                ", service=" + service +
+                ", employee=" + employee +
+                '}';
     }
 }

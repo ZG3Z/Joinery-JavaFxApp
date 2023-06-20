@@ -3,6 +3,7 @@ package com.example.joinery.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,7 @@ public abstract class Service {
     private int costPerDay;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ServiceOrder> serviceOrders;
+    private List<ServiceOrder> serviceOrders = new ArrayList<>();
 
     public Service(){}
 

@@ -58,7 +58,7 @@ public class Controller {
     @FXML
     private TextField selectedServiceText;
     @FXML
-    private ChoiceBox customerChoiceBox;
+    private ChoiceBox customerTypeChoiceBox;
     @FXML
     private Text serviceTypeText;
     @FXML
@@ -72,7 +72,7 @@ public class Controller {
     @FXML
     private Slider assemblySizeSlider;
     @FXML
-    private Label assemblySizeSliderLabel;
+    private Label assemblySizeLabel;
     @FXML
     private Text materialText;
     @FXML
@@ -96,89 +96,73 @@ public class Controller {
     @FXML
     private TableView tableViewEmployee;
     @FXML
-    private ChoiceBox customerChoiceBox2;
+    private ChoiceBox customerChoiceBox;
     @FXML
     private TableView tableViewOrder;
 
     @FXML
     public void initialize() {
         loadDataCustomer();
+
         newOrder = new ServiceOrder(serviceOrders.size()+1, ServiceOrder.Status.planned, LocalDate.now());
 
-        customerChoiceBox.getItems().addAll("Retail customer", "Wholesale customer");
-        serviceChoiceBox.getItems().addAll("Assembly", "Conservation");
-        materialChoiceBox.getItems().addAll("Wood material", "Wood like material");
-        specializationChoiceBox.getItems().addAll("Assembly", "Conservation");
-        customerChoiceBox2.getItems().addAll(Stream.concat(
-                        retailCustomers.stream().map(customer -> customer.getFirstName() + " " + customer.getLastName()),
-                        wholesaleCustomers.stream().map(customer -> customer.getCompanyName()))
-                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-
-
-        assemblyProductNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            saveService.setDisable(newValue.isEmpty());
-            Assembly assembly = (Assembly) newService;
-            assembly.setProductName(newValue);
-        });
-
-        assemblySizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            assemblySizeSliderLabel.setText(String.valueOf(newValue.intValue()));
-            Assembly assembly = (Assembly) newService;
-            assembly.setSize(newValue.intValue());
-        });
-
-        conservationLevelOfDamageChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            saveService.setDisable(newValue == null || newValue.toString().isEmpty());
-            if(conservationLevelOfDamageChoiceBox.getValue() != null){
-                Conservation conservation = (Conservation) newService;
-                conservation.setLevelOfDamage(Conservation.LevelOfDamage.valueOf(newValue.toString()));
-            }
-        });
-
-        customerChoiceBox2.getSelectionModel().selectedItemProperty().addListener(
-                (ChangeListener<String>) (observable, oldValue, newValue) -> handleChoiceBoxChangeCustomer2(newValue)
-        );
+        setChoiceBoxData();
 
         customerChoiceBox.getSelectionModel().selectedItemProperty().addListener(
-                (ChangeListener<String>) (observable, oldValue, newValue) -> handleChoiceBoxChangeCustomer(newValue)
+                (ChangeListener<String>) (observable, oldValue, newValue)
+                        -> handleChoiceBoxChangeCustomer(newValue)
+        );
+
+        customerTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener(
+                (ChangeListener<String>) (observable, oldValue, newValue)
+                        -> handleChoiceBoxChangeCustomerType(newValue)
         );
 
 
         serviceChoiceBox.getSelectionModel().selectedItemProperty().addListener(
-                (ChangeListener<String>) (observable, oldValue, newValue) -> handleChoiceBoxChangeService(newValue)
+                (ChangeListener<String>) (observable, oldValue, newValue)
+                        -> handleChoiceBoxChangeService(newValue)
+        );
+
+        assemblyProductNameTextField.textProperty().addListener(
+                (observable, oldValue, newValue)
+                        -> handleTextFieldChangeProductName(newValue)
+        );
+
+        assemblySizeSlider.valueProperty().addListener(
+                (observable, oldValue, newValue)
+                        -> handleSliderChangeSize(newValue)
+        );
+
+        conservationLevelOfDamageChoiceBox.getSelectionModel().selectedItemProperty().addListener(
+                (ChangeListener<String>) (observable, oldValue, newValue)
+                        -> handleChoiceBoxChangeLevelOfDamage(newValue)
         );
 
         materialChoiceBox.getSelectionModel().selectedItemProperty().addListener(
-                (ChangeListener<String>) (observable, oldValue, newValue) -> handleChoiceBoxChangeMaterial()
+                (ChangeListener<String>) (observable, oldValue, newValue)
+                        -> handleChoiceBoxChangeMaterial()
         );
 
         specializationChoiceBox.getSelectionModel().selectedItemProperty().addListener(
-                (ChangeListener<String>) (observable, oldValue, newValue) -> handleChoiceBoxChangeSpecialization(newValue)
+                (ChangeListener<String>) (observable, oldValue, newValue)
+                        -> handleChoiceBoxChangeSpecialization(newValue)
         );
     }
 
-    private void handleChoiceBoxChangeCustomer2(String newValue) {
-        long idSelectedCustomer = Stream.concat(
-                retailCustomers.stream()
-                        .filter(customer -> customer.getFirstName().equals(newValue.split(" ")[0]) && customer.getLastName().equals(newValue.split(" ")[1]))
-                        .map(RetailCustomer::getId),
-                wholesaleCustomers.stream()
-                        .filter(customer -> customer.getCompanyName().equals(newValue))
-                        .map(WholesaleCustomer::getIdC)
-                ).findFirst().get();
-
-        ObservableList<ServiceOrder> data = FXCollections.observableArrayList(serviceOrders.stream()
-                .filter(order -> order.getCustomer().getIdC() == (idSelectedCustomer))
-                .collect(Collectors.toList())
-        );
-
-        loadTable(List.of("Date","Start date","End date", "Total price", "Status"), tableViewOrder, data);
-
+    private void setChoiceBoxData(){
+        customerTypeChoiceBox.getItems().addAll("Retail customer", "Wholesale customer");
+        serviceChoiceBox.getItems().addAll("Assembly", "Conservation");
+        materialChoiceBox.getItems().addAll("Wood material", "Wood like material");
+        specializationChoiceBox.getItems().addAll("Assembly", "Conservation");
+        customerChoiceBox.getItems().addAll(Stream.concat(
+                        retailCustomers.stream().map(customer -> customer.getFirstName() + " " + customer.getLastName()),
+                        wholesaleCustomers.stream().map(customer -> customer.getCompanyName()))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
     }
 
-
-    private void handleChoiceBoxChangeCustomer(String value){
-        switch (value) {
+    private void handleChoiceBoxChangeCustomerType(String newValue){
+        switch (newValue) {
             case "Retail customer" -> {
                 loadTable(List.of("First name", "Last name", "Date of birth", "Date joined",
                         "Payment preference", "Contact preference", "Telephone", "Email", "Loyalty card level"), tableViewCustomer, retailCustomers);
@@ -190,6 +174,45 @@ public class Controller {
                 tableViewCustomer.setItems(wholesaleCustomers);
             }
         }
+    }
+
+    @FXML
+    private void selectCustomer(){
+        switch (customerTypeChoiceBox.getValue().toString()){
+            case "Retail customer" -> {
+                RetailCustomer selectedCustomer = (RetailCustomer) tableViewCustomer.getSelectionModel().getSelectedItem();
+                assigmentCustomer(selectedCustomer, selectedCustomer.getFirstName() + " " + selectedCustomer.getLastName());
+            }
+            case "Wholesale customer" -> {
+                WholesaleCustomer selectedCustomer = (WholesaleCustomer) tableViewCustomer.getSelectionModel().getSelectedItem();
+                assigmentCustomer(selectedCustomer, selectedCustomer.getCompanyName());
+            }
+        }
+    }
+
+    private void assigmentCustomer(Customer customer, String name){
+        newOrder.removeCustomer();
+        newOrder.addCustomer(customer);
+
+        selectedCustomerText.setText(name);
+        saveCustomer.setVisible(true);
+    }
+
+    @FXML
+    private void saveAssignedCustomer(){
+        loadDataService();
+
+        saveCustomer.setVisible(false);
+        tableViewCustomer.setVisible(false);
+        customerTypeChoiceBox.setDisable(true);
+
+        serviceTypeText.setVisible(true);
+        serviceChoiceBox.setVisible(true);
+
+        selectedAssociates.setDisable(false);
+        removeAssociate.setVisible(true);
+
+        saveService.setVisible(true);
     }
 
     private void handleChoiceBoxChangeService(String selectedValue) {
@@ -210,7 +233,7 @@ public class Controller {
         assemblyProductNameTextField.setText("");
         assemblySizeSlider.setVisible(!isConservation);
         assemblySizeSlider.setValue(5.0);
-        assemblySizeSliderLabel.setVisible(!isConservation);
+        assemblySizeLabel.setVisible(!isConservation);
 
         materialText.setVisible(!isConservation);
         materialChoiceBox.setVisible(!isConservation);
@@ -219,7 +242,7 @@ public class Controller {
         if(isConservation){
             conservationLevelOfDamageChoiceBox.getItems().setAll("low", "high");
             loadTable(List.of("Name", "Toxicity level", "Price"), tableViewElement, chemicals);
-        }else {
+        } else {
             handleChoiceBoxChangeMaterial();
         }
 
@@ -230,6 +253,38 @@ public class Controller {
         tableViewElement.setVisible(true);
         saveService.setDisable(true);
         createNewService();
+    }
+
+    private void createNewService(){
+        switch (serviceChoiceBox.getValue().toString()) {
+            case "Assembly" ->
+                newService = new Assembly(assemblyServices.size() + conservationServices.size(),
+                        assemblyProductNameTextField.getText(),
+                        (int) assemblySizeSlider.getValue());
+            case "Conservation" ->
+                newService = new Conservation(assemblyServices.size() + conservationServices.size(),
+                        Conservation.LevelOfDamage.low);
+        }
+    }
+
+    private void handleTextFieldChangeProductName(String newValue) {
+        saveService.setDisable(newValue.isEmpty());
+        Assembly assembly = (Assembly) newService;
+        assembly.setProductName(newValue);
+    }
+
+    private void handleSliderChangeSize(Number newValue) {
+        assemblySizeLabel.setText(String.valueOf(newValue.intValue()));
+        Assembly assembly = (Assembly) newService;
+        assembly.setSize(newValue.intValue());
+    }
+
+    private void handleChoiceBoxChangeLevelOfDamage(String newValue) {
+        saveService.setDisable(newValue == null || newValue.isEmpty());
+        if(conservationLevelOfDamageChoiceBox.getValue() != null){
+            Conservation conservation = (Conservation) newService;
+            conservation.setLevelOfDamage(Conservation.LevelOfDamage.valueOf(newValue));
+        }
     }
 
     private void  handleChoiceBoxChangeMaterial(){
@@ -246,114 +301,175 @@ public class Controller {
             }
         }
     }
-    private void handleChoiceBoxChangeSpecialization(String value){
-        switch (value) {
-            case "Assembly", "Conservation" -> {
-                ObservableList<Employee> data = FXCollections.observableArrayList( employees.stream()
-                        .filter(employee -> employee.getLicenses().stream()
-                                .anyMatch(license -> license.getSpecialization().getCategory()
-                                        .equals(Specialization.CategorySpecialization.valueOf(value))))
-                        .collect(Collectors.toList())
-                );
-
-                loadTable(List.of("First name", "Last name", "Age", "Date of birth", "Employment date", "Tenure"), tableViewEmployee, data); }
-        }
-    }
 
     @FXML
-    private void tableViewElement(){
-        if (serviceChoiceBox.getValue().equals("Assembly")) {
-            if(materialChoiceBox.getValue() != null){
-                switch (materialChoiceBox.getValue().toString()) {
-                    case "Wood material" -> {
-                        WoodMaterial selectedMaterial = (WoodMaterial) tableViewElement.getSelectionModel().getSelectedItem();
+    private void selectElement(){
+        switch(serviceChoiceBox.getValue().toString()) {
+            case "Assembly" -> {
+                if (materialChoiceBox.getValue() != null) {
+                    switch (materialChoiceBox.getValue().toString()) {
+                        case "Wood material" -> {
+                            WoodMaterial selectedMaterial = (WoodMaterial) tableViewElement.getSelectionModel().getSelectedItem();
 
-                        Assembly assembly = (Assembly) newService;
-                        assembly.addMaterial(selectedMaterial);
-
-                        if (!selectedAssociates.getItems().contains(selectedMaterial.getWoodType())) {
-                            selectedAssociates.getItems().add(selectedMaterial.getWoodType());
+                            addMaterialToService(selectedMaterial);
+                            addElementToChoiceBox(selectedMaterial.getWoodType());
                         }
-                    }
-                    case "Wood like material" -> {
-                        WoodLikeMaterial selectedMaterial = (WoodLikeMaterial) tableViewElement.getSelectionModel().getSelectedItem();
+                        case "Wood like material" -> {
+                            WoodLikeMaterial selectedMaterial = (WoodLikeMaterial) tableViewElement.getSelectionModel().getSelectedItem();
 
-                        Assembly assembly = (Assembly) newService;
-                        assembly.addMaterial(selectedMaterial);
-
-                        if (!selectedAssociates.getItems().contains(selectedMaterial.getMaterial())) {
-                            selectedAssociates.getItems().add(selectedMaterial.getMaterial());
+                            addMaterialToService(selectedMaterial);
+                            addElementToChoiceBox(selectedMaterial.getMaterial());
                         }
                     }
                 }
             }
-        } else if (serviceChoiceBox.getValue().equals("Conservation")) {
-            Chemical selectedChemical = (Chemical) tableViewElement.getSelectionModel().getSelectedItem();
+            case "Conservation" -> {
+                Chemical selectedChemical = (Chemical) tableViewElement.getSelectionModel().getSelectedItem();
 
-            Conservation conservation = (Conservation) newService;
-            conservation.addChemical(selectedChemical);
+                Conservation conservation = (Conservation) newService;
+                conservation.addChemical(selectedChemical);
 
-
-            if (!selectedAssociates.getItems().contains(selectedChemical.getName())) {
-                selectedAssociates.getItems().add(selectedChemical.getName());
+                addElementToChoiceBox(selectedChemical.getName());
             }
         }
     }
 
+    private void addMaterialToService(Material material){
+        Assembly assembly = (Assembly) newService;
+        assembly.addMaterial(material);
+    }
+
+    private void addElementToChoiceBox(String name){
+        if (!selectedAssociates.getItems().contains(name)) {
+            selectedAssociates.getItems().add(name);
+        }
+    }
+
     @FXML
-    private void tableViewEmployee(){
+    private void removeAssociate(){
+        if(selectedAssociates.getValue() != null){
+            switch(serviceChoiceBox.getValue().toString()){
+                case "Assembly" -> {
+                    Assembly assembly = (Assembly) newService;
+                    long idSelectedMaterial = Stream.concat(
+                            woodMaterials.stream()
+                                    .filter(material -> material.getWoodType().equals(selectedAssociates.getValue().toString()))
+                                    .map(WoodMaterial::getId),
+                            woodLikeMaterials.stream()
+                                    .filter(material -> material.getMaterial().equals(selectedAssociates.getValue().toString()))
+                                    .map(WoodLikeMaterial::getId)
+                    ).findFirst().get();
+
+                    assembly.removeMaterial(assembly.getMaterials().stream().filter(m -> m.getId() == idSelectedMaterial).findFirst().get());
+                }
+                case "Conservation" -> {
+                    Conservation conservation = (Conservation) newService;
+                    long idSelectedChemical = chemicals.stream()
+                            .filter(chemical -> chemical.getName().equals(selectedAssociates.getValue().toString()))
+                            .map(Chemical::getId).findFirst().get();
+
+                    conservation.removeChemical(conservation.getChemicalList().stream().filter(ch -> ch.getId() == idSelectedChemical).findFirst().get());
+                }
+            }
+
+            selectedAssociates.getItems().remove(selectedAssociates.getSelectionModel().getSelectedIndex());
+            selectedAssociates.getSelectionModel().clearSelection();
+            selectedAssociates.getSelectionModel().select(null);
+        }
+    }
+
+    @FXML
+    private void saveAssignedService(){
+        loadDataEmployee();
+        addNewServiceToDatabase();
+
+        materialText.setVisible(false);
+        materialChoiceBox.setVisible(false);
+        tableViewElement.setVisible(false);
+        removeAssociate.setVisible(false);
+
+        serviceChoiceBox.setDisable(true);
+        saveService.setVisible(false);
+
+        tableViewEmployee.setVisible(true);
+        specializationText.setVisible(true);
+        specializationChoiceBox.setVisible(true);
+
+        loadTable(List.of("First name", "Last name", "Date of birth", "Age", "Employment date", "Tenure"), tableViewEmployee, employees);
+    }
+
+    private void handleChoiceBoxChangeSpecialization(String value){
+        ObservableList<Employee> data = FXCollections.observableArrayList( employees.stream()
+                .filter(employee -> employee.getLicenses().stream().anyMatch(license -> license.getSpecialization().getCategory()
+                        .equals(Specialization.CategorySpecialization.valueOf(value))))
+                .collect(Collectors.toList())
+        );
+
+        loadTable(List.of("First name", "Last name", "Age", "Date of birth", "Employment date", "Tenure"), tableViewEmployee, data);
+    }
+
+    @FXML
+    private void selectEmployee(){
         Employee selectedEmployee = (Employee) tableViewEmployee.getSelectionModel().getSelectedItem();
-        selectedEmployeeText.setText(selectedEmployee.getFirstName() + " " + selectedEmployee.getLastName());
-        newOrder.removeEmployee();
-        newOrder.addEmployee(selectedEmployee);
+        assigmentEmployee(selectedEmployee, selectedEmployee.getFirstName() + " " + selectedEmployee.getLastName());
+    }
 
-        saveEmployee.setVisible(selectedEmployee.getLicenses().stream()
+    private void assigmentEmployee(Employee employee, String name){
+        if(checkLicense(employee)) {
+            newOrder.removeEmployee();
+            newOrder.addEmployee(employee);
+
+            selectedEmployeeText.setText(name);
+            saveEmployee.setVisible(true);
+        } else {
+            alertMessage("Employee cannot be assigned",
+                    "the selected employee does not have a license in the selected type of service");
+            saveEmployee.setVisible(false);
+        }
+    }
+
+    private boolean checkLicense(Employee employee){
+        return employee.getLicenses().stream()
                 .anyMatch(license -> license.getSpecialization().getCategory()
-                        .equals(Specialization.CategorySpecialization.valueOf(serviceChoiceBox.getValue().toString()))));
+                        .equals(Specialization.CategorySpecialization.valueOf(serviceChoiceBox.getValue().toString())));
     }
 
     @FXML
-    private void tableViewCustomer(){
-        switch (customerChoiceBox.getValue().toString()){
-            case "Retail customer" -> {
-                RetailCustomer selectedCustomer = (RetailCustomer) tableViewCustomer.getSelectionModel().getSelectedItem();
-                selectedCustomerText.setText(selectedCustomer.getFirstName() + " " + selectedCustomer.getLastName());
-                newOrder.removeCustomer();
-                newOrder.addCustomer(selectedCustomer);
+    private void saveEmployee(){
+        saveEmployee.setVisible(false);
+        specializationChoiceBox.setDisable(true);
+        tableViewEmployee.setDisable(true);
 
-                saveCustomer.setVisible(true);
-            }
-            case "Wholesale customer" -> {
-                WholesaleCustomer selectedCustomer = (WholesaleCustomer) tableViewCustomer.getSelectionModel().getSelectedItem();
-                selectedCustomerText.setText(selectedCustomer.getCompanyName());
-                newOrder.removeCustomer();
-                newOrder.addCustomer(selectedCustomer);
+        addServiceToOrder();
+        addNewOrderToDatabase();
+        alertMessage("Added a new order",
+                "Discount: " + newOrder.getCustomer().getDiscount() + "%\nTotal price: " + newOrder.getTotalPrice() + "$");
 
-                saveCustomer.setVisible(true);
-            }
-        }
+        Stage stage = (Stage) saveEmployee.getScene().getWindow();
+        stage.close();
     }
 
+    private void addServiceToOrder(){
+        newOrder.removeService();
+        newOrder.addService(newService);
+    }
 
-    private void loadTable(List<String> columns, TableView tableView, ObservableList<?> items){
-        List<TableColumn> tableColumns = new ArrayList<>();
+    private void handleChoiceBoxChangeCustomer(String newValue) {
+        long idSelectedCustomer = Stream.concat(
+                retailCustomers.stream()
+                        .filter(customer -> customer.getFirstName().equals(newValue.split(" ")[0]) && customer.getLastName().equals(newValue.split(" ")[1]))
+                        .map(RetailCustomer::getId),
+                wholesaleCustomers.stream()
+                        .filter(customer -> customer.getCompanyName().equals(newValue))
+                        .map(WholesaleCustomer::getIdC)
+        ).findFirst().get();
 
-        for(String col : columns)
-            tableColumns.add(new TableColumn(col));
+        ObservableList<ServiceOrder> data = FXCollections.observableArrayList(serviceOrders.stream()
+                .filter(order -> order.getCustomer().getIdC() == (idSelectedCustomer))
+                .collect(Collectors.toList())
+        );
 
-
-       tableView.getColumns().setAll(tableColumns);
-
-        for(TableColumn col : tableColumns) {
-            float width = (float) ((tableView.widthProperty().floatValue() - 5) / tableColumns.size());
-            col.setPrefWidth(width);
-            col.setCellValueFactory(new PropertyValueFactory<>(Arrays.stream(col.getText().split(" "))
-                    .map(String::toLowerCase)
-                    .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
-                    .collect(Collectors.joining(""))));
-        }
-
-        tableView.setItems(items);
+        loadTable(List.of("Date","Start date","End date", "Total price", "Status"), tableViewOrder, data);
     }
 
     @FXML
@@ -367,100 +483,34 @@ public class Controller {
         ordersView.setVisible(false);
         newOrderView.setVisible(true);
     }
-    @FXML
-    private void saveCustomer(){
-        saveCustomer.setVisible(false);
-        loadDataService();
-        tableViewCustomer.setVisible(false);
 
-        customerChoiceBox.setDisable(true);
-        serviceTypeText.setVisible(true);
-        serviceChoiceBox.setVisible(true);
-
-        selectedAssociates.setDisable(false);
-        removeAssociate.setVisible(true);
-        saveService.setVisible(true);
-        saveService.setDisable(true);
-    }
-    @FXML
-    private void removeAssociate(){
-        if(selectedAssociates.getValue() != null){
-            switch(serviceChoiceBox.getValue().toString()){
-                case "Assembly" -> {
-                    Assembly assembly = (Assembly) newService;
-                    long idSelectedMaterial = Stream.concat(
-                                    woodMaterials.stream()
-                                            .filter(material -> material.getWoodType().equals(selectedAssociates.getValue().toString()))
-                                            .map(WoodMaterial::getId),
-                                    woodLikeMaterials.stream()
-                                            .filter(material -> material.getMaterial().equals(selectedAssociates.getValue().toString()))
-                                            .map(WoodLikeMaterial::getId)
-                            ).findFirst().get();
-                   assembly.removeMaterial(assembly.getMaterials().stream().filter(m -> m.getId() == idSelectedMaterial).findFirst().get());
-                }
-                case "Conservation" -> {
-                    Conservation conservation = (Conservation) newService;
-                    long idSelectedChemical = chemicals.stream()
-                            .filter(chemical -> chemical.getName().equals(selectedAssociates.getValue().toString()))
-                            .map(Chemical::getId).findFirst().get();
-                   conservation.removeChemical(conservation.getChemicalList().stream().filter(ch -> ch.getId() == idSelectedChemical).findFirst().get());
-                }
-            }
-            selectedAssociates.getItems().remove(selectedAssociates.getSelectionModel().getSelectedIndex());
-            selectedAssociates.getSelectionModel().clearSelection();
-            selectedAssociates.getSelectionModel().select(null);
-        }
-    }
-    @FXML
-    private void saveService(){
-        loadDataEmployee();
-        tableViewElement.setVisible(false);
-        tableViewEmployee.setVisible(true);
-
-        saveService.setVisible(false);
-        materialText.setVisible(false);
-        materialChoiceBox.setVisible(false);
-        removeAssociate.setVisible(false);
-
-        serviceChoiceBox.setDisable(true);
-
-        specializationText.setVisible(true);
-        specializationChoiceBox.setVisible(true);
-
-        loadTable(List.of("First name", "Last name", "Date of birth", "Age", "Employment date", "Tenure"), tableViewEmployee, employees);
-}
-    @FXML
-    private void saveEmployee(){
-        saveEmployee.setVisible(false);
-        specializationChoiceBox.setDisable(true);
-        tableViewEmployee.setDisable(true);
-
-     //   addNewOrderToDatabase(createNewService());
-    }
-
-    private void createNewService(){
-
-        switch (serviceChoiceBox.getValue().toString()) {
-            case "Assembly" -> {
-                newService = new Assembly(assemblyServices.size() + conservationServices.size(),
-                        assemblyProductNameTextField.getText(),
-                        (int) assemblySizeSlider.getValue());
-            }
-            case "Conservation" -> {
-                newService = new Conservation(assemblyServices.size() + conservationServices.size(),
-                        Conservation.LevelOfDamage.low);
-            }
-        }
-    }
-
-    private void alertMessage(ServiceOrder order){
+    private void alertMessage(String header, String content){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("ADDED A NEW ORDER");
-        alert.setHeaderText(order.toString());
-        alert.setContentText("Discount: " + order.getCustomer().getDiscount() + "%\nTotal price: " + order.getTotalPrice() + "$");
+        alert.setTitle("JOINERY");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
         alert.showAndWait();
-        Stage stage = (Stage) saveEmployee.getScene().getWindow();
-        stage.close();
+
+    }
+    private void loadTable(List<String> columns, TableView tableView, ObservableList<?> items){
+        List<TableColumn> tableColumns = new ArrayList<>();
+
+        for(String col : columns)
+            tableColumns.add(new TableColumn(col));
+
+
+        tableView.getColumns().setAll(tableColumns);
+
+        for(TableColumn col : tableColumns) {
+            float width = (float) ((tableView.widthProperty().floatValue() - 5) / tableColumns.size());
+            col.setPrefWidth(width);
+            col.setCellValueFactory(new PropertyValueFactory<>(Arrays.stream(col.getText().split(" "))
+                    .map(String::toLowerCase)
+                    .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
+                    .collect(Collectors.joining(""))));
+        }
+
+        tableView.setItems(items);
     }
     private void loadDataCustomer(){
         session  = sessionFactory.openSession();
@@ -613,14 +663,23 @@ public class Controller {
             session.getTransaction().rollback();
         }
     }
-    private void addNewOrderToDatabase(Service service){
-      //  ServiceOrder newOrder = new ServiceOrder(serviceOrders.size()+1, ServiceOrder.Status.planned, LocalDate.now());
-        alertMessage(newOrder);
-
+    private void addNewServiceToDatabase() {
         try {
             session.beginTransaction();
 
-            session.save(service);
+            session.save(newService);
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        }
+    }
+    private void addNewOrderToDatabase(){
+        System.out.println(newOrder.toString());
+        try {
+            session.beginTransaction();
+
             session.save(newOrder);
 
             session.getTransaction().commit();
