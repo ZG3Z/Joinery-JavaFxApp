@@ -1,7 +1,10 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
+
+package com.example.joinery.models;
 
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +61,12 @@ public class Chemical {
         return toxicityLevel;
     }
 
+    /**
+     * Sets the level of toxicity for the service.
+     *
+     * @param toxicityLevel The level of toxicity to set. Must be within the range of 1 to 5 (inclusive).
+     * @throws IllegalArgumentException If the provided toxicity level is outside the valid range.
+     */
     public void setToxicityLevel(int toxicityLevel) {
         if (toxicityLevel >= 1 && toxicityLevel <= 5) {
             this.toxicityLevel = toxicityLevel;
@@ -81,14 +90,12 @@ public class Chemical {
     public void addConservation(Conservation newConservation){
         if(!conservationList.contains(newConservation)) {
             conservationList.add(newConservation);
-            newConservation.addChemical(this);
         }
     }
 
     public void removeConservation(Conservation conservation){
         if(!conservationList.contains(conservation)) {
             conservationList.remove(conservation);
-            conservation.removeChemical(this);
         }
     }
 

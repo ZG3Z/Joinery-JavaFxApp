@@ -1,10 +1,13 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
+
+package com.example.joinery.models;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-import java.util.List;
 
 @Entity
 @Table(name = "woodLikeMaterial")
@@ -25,6 +28,7 @@ public class WoodLikeMaterial extends Material{
         setMaterial(material);
         setManufacturer(manufacturer);
     }
+
 
     public String getMaterial() {
         return material;

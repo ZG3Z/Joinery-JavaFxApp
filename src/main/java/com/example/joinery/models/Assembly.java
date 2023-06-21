@@ -1,9 +1,12 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
+
+package com.example.joinery.models;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "assembly")
@@ -26,11 +29,12 @@ public class Assembly extends Service {
     public Assembly(long id, String productName, int size) {
         super();
         setId(id);
-        setCostPerDay(100);
+        setCostPerDay(COST_PER_DAY_ASSEMBLY);
 
         setProductName(productName);
         setSize(size);
     }
+
 
     public String getProductName() {
         return productName;
@@ -44,6 +48,13 @@ public class Assembly extends Service {
         return size;
     }
 
+    /**
+     * Sets the size of the object subject to conservation.
+     * The size must be within the range of 1 to 10 (inclusive).
+     *
+     * @param size The size value to be set.
+     * @throws IllegalArgumentException if the size value is invalid.
+     */
     public void setSize(int size) {
         if (size >= 1 && size <= 10) {
             this.size = size;
@@ -59,14 +70,12 @@ public class Assembly extends Service {
     public void addMaterial(Material newMaterial){
         if(!materialList.contains(newMaterial)) {
             materialList.add(newMaterial);
-            newMaterial.addAssembly(this);
         }
     }
 
     public void removeMaterial(Material material){
         if(materialList.contains(material)) {
             materialList.remove(material);
-            material.removeAssembly(this);
         }
     }
 
@@ -74,15 +83,29 @@ public class Assembly extends Service {
         this.materialList = materialList;
     }
 
+    /**
+     * Calculates the number of days required to complete the conservation service.
+     * The number of days is determined by adding the size of the object subject to conservation
+     * and the number of materials in the material list.
+     *
+     * @return The number of days to complete the service.
+     */
     @Transient
     @Override
     public int getDaysToComplete() {
         return size + materialList.size();
     }
 
+    /**
+     * Calculates the total cost of the conservation service.
+     * The total cost is calculated by multiplying the cost per day with the number of days to complete the service,
+     * and adding the prices of all the materials in the material list.
+     *
+     * @return The total service cost.
+     */
     @Transient
     @Override
     public int getTotalServiceCost() {
-        return getCostPerDay() * getDaysToComplete() + materialList.stream().mapToInt(m -> m.getPrice()).sum();
+        return getCostPerDay() * getDaysToComplete() + materialList.stream().mapToInt(Material::getPrice).sum();
     }
 }

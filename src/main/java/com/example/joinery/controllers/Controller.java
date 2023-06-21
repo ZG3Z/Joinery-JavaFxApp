@@ -1,6 +1,11 @@
-package com.example.joinery.controller;
+package com.example.joinery.controllers;
 
-import com.example.joinery.entity.*;
+import com.example.joinery.Services.IDatabase;
+import com.example.joinery.Services.MySqlDatabase;
+import com.example.joinery.enums.Status;
+import com.example.joinery.models.*;
+import com.example.joinery.enums.CategorySpecialization;
+import com.example.joinery.enums.LevelOfDamage;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,19 +15,27 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.example.joinery.models.Service.COST_PER_DAY_ASSEMBLY;
+import static com.example.joinery.models.Service.COST_PER_DAY_CONSERVATION;
+
 public class Controller {
-    private final SessionFactory sessionFactory = new Configuration()
-            .configure("hibernate.cfg.xml")
-            .buildSessionFactory();
-    private Session session;
+
+    /**
+     * An instance of the IDatabase interface used for data management and communication with the database.
+     * By default, it utilizes the MySqlDatabase implementation.
+     * It is possible to use different implementations of IDatabase tailored to handle different databases.
+     *
+     * @see IDatabase
+     * @see MySqlDatabase
+     */
+    private final IDatabase database = new MySqlDatabase();
+
     ObservableList<RetailCustomer> retailCustomers = FXCollections.observableArrayList();
     ObservableList<WholesaleCustomer> wholesaleCustomers = FXCollections.observableArrayList();
     ObservableList<Assembly> assemblyServices = FXCollections.observableArrayList();
@@ -33,18 +46,14 @@ public class Controller {
     ObservableList<Specialization> specializations = FXCollections.observableArrayList();
     ObservableList<Employee> employees = FXCollections.observableArrayList();
     ObservableList<ServiceOrder> serviceOrders = FXCollections.observableArrayList();
+
+    private Service newService;
+    private ServiceOrder newOrder = new ServiceOrder();
+
     @FXML
     private GridPane ordersView;
     @FXML
     private GridPane newOrderView;
-
-    @FXML
-    private Button viewOrdersButton;
-    @FXML
-    private Button returnButton;
-
-    private Service newService;
-    private ServiceOrder newOrder;
     @FXML
     private Button saveCustomer;
     @FXML
@@ -100,11 +109,17 @@ public class Controller {
     @FXML
     private TableView tableViewOrder;
 
+    /**
+     * Initializes the controller and sets up event listeners for UI components.
+     *
+     * It loads data from the database for the given entity types: "Order", "Retail customer", "Wholesale customer".
+     *
+     * The method sets up choice boxes, text fields, sliders, and other UI components with their respective event listeners
+     * to handle changes in user input.
+     */
     @FXML
     public void initialize() {
-        loadDataCustomer();
-
-        newOrder = new ServiceOrder(serviceOrders.size()+1, ServiceOrder.Status.planned, LocalDate.now());
+        loadDataFromDatabase(List.of("Order", "Retail customer", "Wholesale customer"));
 
         setChoiceBoxData();
 
@@ -150,6 +165,9 @@ public class Controller {
         );
     }
 
+    /**
+     * Sets up the choice boxes by populating them with the item names.
+     */
     private void setChoiceBoxData(){
         customerTypeChoiceBox.getItems().addAll("Retail customer", "Wholesale customer");
         serviceChoiceBox.getItems().addAll("Assembly", "Conservation");
@@ -161,21 +179,33 @@ public class Controller {
                 .collect(Collectors.toCollection(FXCollections::observableArrayList)));
     }
 
+    /**
+     * Handles the change event of the customer type choice box.
+     * Updates the table view based on the selected customer type.
+     *
+     * @param newValue The newly selected customer type.
+     */
     private void handleChoiceBoxChangeCustomerType(String newValue){
         switch (newValue) {
             case "Retail customer" -> {
-                loadTable(List.of("First name", "Last name", "Date of birth", "Date joined",
+                loadDataToTable(List.of("First name", "Last name", "Date of birth", "Date joined",
                         "Payment preference", "Contact preference", "Telephone", "Email", "Loyalty card level"), tableViewCustomer, retailCustomers);
                 tableViewCustomer.setItems(retailCustomers);
             }
             case "Wholesale customer" -> {
-                loadTable(List.of("Company name", "NIP", "Date joined", "" +
+                loadDataToTable(List.of("Company name", "NIP", "Date joined", "" +
                         "Payment preference", "Contact preference", "Telephone", "Email"), tableViewCustomer, wholesaleCustomers);
                 tableViewCustomer.setItems(wholesaleCustomers);
             }
         }
     }
 
+    /**
+     * Handles the event of selecting a customer.
+     * Checks the type of the selected customer (Retail or Wholesale) and assigns it to the order.
+     *
+     * @throws NullPointerException if no customer is selected or the value of customerTypeChoiceBox is null
+     */
     @FXML
     private void selectCustomer(){
         switch (customerTypeChoiceBox.getValue().toString()){
@@ -190,6 +220,12 @@ public class Controller {
         }
     }
 
+    /**
+     * Assigns a customer to the new order and updates the selected customer text and save customer visibility.
+     *
+     * @param customer The customer to be assigned
+     * @param name The name to be displayed as the selected customer
+     */
     private void assigmentCustomer(Customer customer, String name){
         newOrder.removeCustomer();
         newOrder.addCustomer(customer);
@@ -198,9 +234,13 @@ public class Controller {
         saveCustomer.setVisible(true);
     }
 
+    /**
+     * Saves the assigned customer and updates the visibility of UI elements accordingly.
+     * Loads data for additional elements from the database.
+     */
     @FXML
     private void saveAssignedCustomer(){
-        loadDataService();
+        loadDataFromDatabase(List.of("Wood material", "Wood like material", "Chemical"));
 
         saveCustomer.setVisible(false);
         tableViewCustomer.setVisible(false);
@@ -215,6 +255,11 @@ public class Controller {
         saveService.setVisible(true);
     }
 
+    /**
+     * Handles the change event of the service choice box.
+     *
+     * @param selectedValue the selected value in the service choice box
+     */
     private void handleChoiceBoxChangeService(String selectedValue) {
         if ("Assembly".equals(selectedValue)) {
             changeService(false, "Assembly");
@@ -223,6 +268,12 @@ public class Controller {
         }
     }
 
+    /**
+     * Changes the display settings based on the selected service value.
+     *
+     * @param isConservation true if the selected service is "Conservation", false if it is "Assembly"
+     * @param title the title of the selected service
+     */
     private void changeService(boolean isConservation, String title){
         conservationLevelOfDamageText.setVisible(isConservation);
         conservationLevelOfDamageChoiceBox.setVisible(isConservation);
@@ -241,7 +292,7 @@ public class Controller {
 
         if(isConservation){
             conservationLevelOfDamageChoiceBox.getItems().setAll("low", "high");
-            loadTable(List.of("Name", "Toxicity level", "Price"), tableViewElement, chemicals);
+            loadDataToTable(List.of("Name", "Toxicity level", "Price"), tableViewElement, chemicals);
         } else {
             handleChoiceBoxChangeMaterial();
         }
@@ -255,53 +306,89 @@ public class Controller {
         createNewService();
     }
 
+    /**
+     * Creates a new service object based on the selected service choice.
+     */
     private void createNewService(){
         switch (serviceChoiceBox.getValue().toString()) {
-            case "Assembly" ->
-                newService = new Assembly(assemblyServices.size() + conservationServices.size(),
-                        assemblyProductNameTextField.getText(),
-                        (int) assemblySizeSlider.getValue());
-            case "Conservation" ->
-                newService = new Conservation(assemblyServices.size() + conservationServices.size(),
-                        Conservation.LevelOfDamage.low);
+            case "Assembly" -> {
+                newService = new Assembly();
+                newService.setId(assemblyServices.size() + conservationServices.size());
+                newService.setCostPerDay(COST_PER_DAY_ASSEMBLY);
+            }
+            case "Conservation" -> {
+                newService = new Conservation();
+                newService.setId(assemblyServices.size() + conservationServices.size());
+                newService.setCostPerDay(COST_PER_DAY_CONSERVATION);
+            }
         }
     }
 
+    /**
+     * Handles the change event of the product name text field.
+     * Updates the new service object with the new product name.
+     * Disables the save service button if the product name is empty.
+     *
+     * @param newValue The new value of the product name text field.
+     */
     private void handleTextFieldChangeProductName(String newValue) {
         saveService.setDisable(newValue.isEmpty());
         Assembly assembly = (Assembly) newService;
         assembly.setProductName(newValue);
     }
 
+    /**
+     * Handles the change event of the size slider.
+     * Updates the new service object with the new size value.
+     *
+     * @param newValue The new value of the size slider.
+     */
     private void handleSliderChangeSize(Number newValue) {
         assemblySizeLabel.setText(String.valueOf(newValue.intValue()));
         Assembly assembly = (Assembly) newService;
         assembly.setSize(newValue.intValue());
     }
 
+    /**
+     * Handles the change event of the level of damage choice box.
+     * Updates the new service object with the new level of damage value.
+     * Disables the save service button if the level of damage is null or empty.
+     *
+     * @param newValue The new value of the level of damage choice box.
+     */
     private void handleChoiceBoxChangeLevelOfDamage(String newValue) {
         saveService.setDisable(newValue == null || newValue.isEmpty());
         if(conservationLevelOfDamageChoiceBox.getValue() != null){
             Conservation conservation = (Conservation) newService;
-            conservation.setLevelOfDamage(Conservation.LevelOfDamage.valueOf(newValue));
+            conservation.setLevelOfDamage(LevelOfDamage.valueOf(newValue));
         }
     }
 
+    /**
+     * Handles the change event of the material choice box.
+     * Loads the corresponding data to the table view based on the selected material.
+     */
     private void  handleChoiceBoxChangeMaterial(){
         if(materialChoiceBox.getValue() != null) {
             switch (materialChoiceBox.getValue().toString()) {
                 case "Wood material" -> {
-                    loadTable(List.of("Wood type", "Hardness", "Price"), tableViewElement, woodMaterials);
+                    loadDataToTable(List.of("Wood type", "Hardness", "Price"), tableViewElement, woodMaterials);
                     tableViewElement.setVisible(true);
                 }
                 case "Wood like material" -> {
-                    loadTable(List.of("Material", "Manufacturer", "Price"), tableViewElement, woodLikeMaterials);
+                    loadDataToTable(List.of("Material", "Manufacturer", "Price"), tableViewElement, woodLikeMaterials);
                     tableViewElement.setVisible(true);
                 }
             }
         }
     }
 
+    /**
+     * Handles the selection event of the element in the table view.
+     * Adds the selected element to the service based on the selected service type.
+     *
+     * @throws IllegalStateException if the service choice box value is null.
+     */
     @FXML
     private void selectElement(){
         switch(serviceChoiceBox.getValue().toString()) {
@@ -334,17 +421,31 @@ public class Controller {
         }
     }
 
+    /**
+     * Adds the given material to the assembly service.
+     *
+     * @param material the material to add to the assembly service
+     */
     private void addMaterialToService(Material material){
         Assembly assembly = (Assembly) newService;
         assembly.addMaterial(material);
     }
 
+    /**
+     * Adds the given name as an element to the selected associates choice box.
+     *
+     * @param name the name to add to the selected associates choice box
+     */
     private void addElementToChoiceBox(String name){
         if (!selectedAssociates.getItems().contains(name)) {
             selectedAssociates.getItems().add(name);
         }
     }
 
+    /**
+     * Removes the selected associate from the assembly service or conservation service.
+     * It updates the associated materials or chemicals accordingly.
+     */
     @FXML
     private void removeAssociate(){
         if(selectedAssociates.getValue() != null){
@@ -378,10 +479,17 @@ public class Controller {
         }
     }
 
+    /**
+     * Saves the assigned service by adding it to the database and updating the UI.
+     * It loads data from the database for employees and specializations.
+     * The material-related UI elements are hidden, and the service-related UI elements are disabled.
+     * The employee-related UI elements are shown, and the table view is loaded with employee data.
+     */
     @FXML
     private void saveAssignedService(){
-        loadDataEmployee();
-        addNewServiceToDatabase();
+        loadDataFromDatabase(List.of("Employee", "Specialization"));
+
+        database.addNewService(newService);
 
         materialText.setVisible(false);
         materialChoiceBox.setVisible(false);
@@ -395,25 +503,46 @@ public class Controller {
         specializationText.setVisible(true);
         specializationChoiceBox.setVisible(true);
 
-        loadTable(List.of("First name", "Last name", "Date of birth", "Age", "Employment date", "Tenure"), tableViewEmployee, employees);
+        loadDataToTable(List.of("First name", "Last name", "Date of birth", "Age", "Employment date", "Tenure"), tableViewEmployee, employees);
     }
 
+    /**
+     * Handles the change in the specialization choice box.
+     * Updates the employee table view based on the selected specialization.
+     * It filters the employees based on the licenses that match the selected specialization category.
+     * Loads the filtered employee data into the table view.
+     *
+     * @param value The selected value from the specialization choice box.
+     */
     private void handleChoiceBoxChangeSpecialization(String value){
         ObservableList<Employee> data = FXCollections.observableArrayList( employees.stream()
                 .filter(employee -> employee.getLicenses().stream().anyMatch(license -> license.getSpecialization().getCategory()
-                        .equals(Specialization.CategorySpecialization.valueOf(value))))
+                        .equals(CategorySpecialization.valueOf(value))))
                 .collect(Collectors.toList())
         );
 
-        loadTable(List.of("First name", "Last name", "Age", "Date of birth", "Employment date", "Tenure"), tableViewEmployee, data);
+        loadDataToTable(List.of("First name", "Last name", "Age", "Date of birth", "Employment date", "Tenure"), tableViewEmployee, data);
     }
 
+    /**
+     * Selects an employee from the employee table view.
+     * Assigns the selected employee to the new order.
+     * Updates the selected employee text and enables the save employee button.
+     */
     @FXML
     private void selectEmployee(){
         Employee selectedEmployee = (Employee) tableViewEmployee.getSelectionModel().getSelectedItem();
         assigmentEmployee(selectedEmployee, selectedEmployee.getFirstName() + " " + selectedEmployee.getLastName());
     }
 
+    /**
+     * Assigns an employee to the new order.
+     * Updates the selected employee text and enables the save employee button.
+     * Displays an error message if the employee does not have a license in the selected type of service.
+     *
+     * @param employee The employee to be assigned.
+     * @param name     The name of the employee.
+     */
     private void assigmentEmployee(Employee employee, String name){
         if(checkLicense(employee)) {
             newOrder.removeEmployee();
@@ -428,12 +557,25 @@ public class Controller {
         }
     }
 
+    /**
+     * Checks if the employee has a license in the selected type of service.
+     *
+     * @param employee The employee to check.
+     * @return True if the employee has a license in the selected type of service, false otherwise.
+     */
     private boolean checkLicense(Employee employee){
         return employee.getLicenses().stream()
                 .anyMatch(license -> license.getSpecialization().getCategory()
-                        .equals(Specialization.CategorySpecialization.valueOf(serviceChoiceBox.getValue().toString())));
+                        .equals(CategorySpecialization.valueOf(serviceChoiceBox.getValue().toString())));
     }
 
+    /**
+     * Saves the assigned employee to the new order.
+     * Disables the save employee button, specialization choice box, and employee table view.
+     * Adds the service to the order.
+     * Displays an alert message with the order details.
+     * Closes the current window.
+     */
     @FXML
     private void saveEmployee(){
         saveEmployee.setVisible(false);
@@ -441,7 +583,6 @@ public class Controller {
         tableViewEmployee.setDisable(true);
 
         addServiceToOrder();
-        addNewOrderToDatabase();
         alertMessage("Added a new order",
                 "Discount: " + newOrder.getCustomer().getDiscount() + "%\nTotal price: " + newOrder.getTotalPrice() + "$");
 
@@ -449,11 +590,24 @@ public class Controller {
         stage.close();
     }
 
+
     private void addServiceToOrder(){
-        newOrder.removeService();
+        newOrder.setId(serviceOrders.size()+1);
+        newOrder.setStatus(Status.planned);
+        newOrder.setDate(LocalDate.now());
         newOrder.addService(newService);
+        database.addNewServiceOrder(newOrder);
+        database.closeConnect();
     }
 
+    /**
+     * Handles the change in the customer choice box.
+     * Retrieves the ID of the selected customer based on the choice box value.
+     * Filters the service orders to display only the ones associated with the selected customer.
+     * Loads the filtered data into the table view.
+     *
+     * @param newValue The new value selected in the customer choice box.
+     */
     private void handleChoiceBoxChangeCustomer(String newValue) {
         long idSelectedCustomer = Stream.concat(
                 retailCustomers.stream()
@@ -469,7 +623,7 @@ public class Controller {
                 .collect(Collectors.toList())
         );
 
-        loadTable(List.of("Date","Start date","End date", "Total price", "Status"), tableViewOrder, data);
+        loadDataToTable(List.of("Date","Start date","End date", "Total price", "Status"), tableViewOrder, data);
     }
 
     @FXML
@@ -484,6 +638,12 @@ public class Controller {
         newOrderView.setVisible(true);
     }
 
+    /**
+     * Displays an information alert message with the specified header and content.
+     *
+     * @param header the header text of the alert
+     * @param content the content text of the alert
+     */
     private void alertMessage(String header, String content){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("JOINERY");
@@ -492,7 +652,15 @@ public class Controller {
         alert.showAndWait();
 
     }
-    private void loadTable(List<String> columns, TableView tableView, ObservableList<?> items){
+
+    /**
+     * Loads data to the TableView based on the provided columns, TableView, and items.
+     *
+     * @param columns a list of column names for the TableView
+     * @param tableView the TableView to load data into
+     * @param items the ObservableList of items to display in the TableView
+     */
+    private void loadDataToTable(List<String> columns, TableView tableView, ObservableList<?> items){
         List<TableColumn> tableColumns = new ArrayList<>();
 
         for(String col : columns)
@@ -512,184 +680,25 @@ public class Controller {
 
         tableView.setItems(items);
     }
-    private void loadDataCustomer(){
-        session  = sessionFactory.openSession();
-        try {
-            session.beginTransaction();
 
-            List<ServiceOrder> serviceOrders = session.createQuery("FROM ServiceOrder ", ServiceOrder.class).getResultList();
-
-
-            List<RetailCustomer> rCustomers = session.createQuery("FROM RetailCustomer ", RetailCustomer.class).getResultList();
-            List<WholesaleCustomer> wCustomers = session.createQuery("FROM WholesaleCustomer ", WholesaleCustomer.class).getResultList();
-
-            for(ServiceOrder order : serviceOrders) {
-                ServiceOrder serviceOrder = new ServiceOrder(
-                        order.getId(),
-                        order.getStatus(),
-                        order.getStartDate()
-                );
-                serviceOrder.setCustomer(order.getCustomer());
-                serviceOrder.setService(order.getService());
-                serviceOrder.setEmployee(order.getEmployee());
-                this.serviceOrders.add(serviceOrder);
-            }
-
-
-            for(RetailCustomer customer : rCustomers){
-                this.retailCustomers.add(new RetailCustomer(
-                        customer.getIdC(),
-                        customer.getFirstName(),
-                        customer.getLastName(),
-                        customer.getDateOfBirth(),
-                        customer.getDateJoined(),
-                        customer.getPaymentPreference(),
-                        customer.getContactPreference(),
-                        customer.getTelephone(),
-                        customer.getEmail(),
-                        customer.getLoyaltyCardLevel()
-                ));
-            }
-
-            for(WholesaleCustomer customer : wCustomers){
-                this.wholesaleCustomers.add(new WholesaleCustomer(
-                        customer.getIdC(),
-                        customer.getCompanyName(),
-                        customer.getNip(),
-                        customer.getDateJoined(),
-                        customer.getPaymentPreference(),
-                        customer.getContactPreference(),
-                        customer.getTelephone(),
-                        customer.getEmail()
-                ));
-            }
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-        }
-    }
-    private void loadDataService(){
-        try {
-            session.beginTransaction();
-
-            List<Assembly> aServices = session.createQuery("FROM Assembly ", Assembly.class).getResultList();
-            List<Conservation> cServices = session.createQuery("FROM Conservation ", Conservation.class).getResultList();
-            List<WoodMaterial>  wMaterials = session.createQuery("FROM WoodMaterial ", WoodMaterial.class).getResultList();
-            List<WoodLikeMaterial> wlMaterials = session.createQuery("FROM WoodLikeMaterial ", WoodLikeMaterial.class).getResultList();
-            List<Chemical> chemicals = session.createQuery("FROM Chemical ", Chemical.class).getResultList();
-
-            for(Assembly service : aServices){
-                this.assemblyServices.add(new Assembly(
-                        service.getId(),
-                        service.getProductName(),
-                        service.getSize()
-                ));
-            }
-
-            for(Conservation service : cServices){
-                this.conservationServices.add(new Conservation(
-                        service.getId(),
-                        service.getLevelOfDamage()
-                ));
-            }
-
-            for(WoodMaterial material : wMaterials){
-                this.woodMaterials.add(new WoodMaterial(
-                        material.getId(),
-                        material.getWoodType(),
-                        material.getHardness(),
-                        material.getPrice()
-                ));
-            }
-
-            for(WoodLikeMaterial material : wlMaterials){
-                this.woodLikeMaterials.add(new WoodLikeMaterial(
-                        material.getId(),
-                        material.getMaterial(),
-                        material.getManufacturer(),
-                        material.getPrice()
-                ));
-            }
-
-            for(Chemical chemical : chemicals){
-                this.chemicals.add(new Chemical(
-                        chemical.getId(),
-                        chemical.getName(),
-                        chemical.getToxicityLevel(),
-                        chemical.getPrice()
-                ));
-            }
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-        }
-    }
-    private void loadDataEmployee(){
-        try {
-            session.beginTransaction();
-
-            List<Specialization> specializations = session.createQuery("FROM Specialization ", Specialization.class).getResultList();
-            List<Employee> employees = session.createQuery("FROM Employee ", Employee.class).getResultList();
-
-            for(Specialization specialization : specializations){
-                Specialization spec = new Specialization(
-                        specialization.getId(),
-                        specialization.getName(),
-                        specialization.getCategory()
-                );
-                spec.setLicenses(spec.getLicenses());
-                this.specializations.add(spec);
-            }
-
-            for(Employee employee : employees){
-                Employee emp = new Employee(
-                        employee.getId(),
-                        employee.getFirstName(),
-                        employee.getLastName(),
-                        employee.getDateOfBirth(),
-                        employee.getEmploymentDate()
-                );
-                emp.setLicenses(employee.getLicenses());
-                this.employees.add(emp);
-            }
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-        }
-    }
-    private void addNewServiceToDatabase() {
-        try {
-            session.beginTransaction();
-
-            session.save(newService);
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-        }
-    }
-    private void addNewOrderToDatabase(){
-        System.out.println(newOrder.toString());
-        try {
-            session.beginTransaction();
-
-            session.save(newOrder);
-
-            session.getTransaction().commit();
-            session.close();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            if (sessionFactory != null) {
-                sessionFactory.close();
+    /**
+     * Loads data from the database based on the provided table names.
+     *
+     * @param tableNames a list of table names to load data from
+     */
+    private void loadDataFromDatabase(List<String> tableNames) {
+        for (String tableName : tableNames) {
+            switch (tableName) {
+                case "Retail customer" -> retailCustomers.setAll(database.getRetailCustomers());
+                case "Wholesale customer" -> wholesaleCustomers.setAll(database.getWholesaleCustomers());
+                case "Assembly" -> assemblyServices.setAll(database.getAssemblyServices());
+                case "Conservation" -> conservationServices.setAll(database.getConservationServices());
+                case "Wood material" -> woodMaterials.setAll(database.getWoodMaterials());
+                case "Wood like material" -> woodLikeMaterials.setAll(database.getWoodLikeMaterials());
+                case "Chemical" -> chemicals.setAll(database.getChemicals());
+                case "Employee" -> employees.setAll(database.getEmployees());
+                case "Specialization" -> specializations.setAll(database.getSpecializations());
+                case "Order" -> serviceOrders.setAll(database.getServiceOrders());
             }
         }
     }

@@ -1,12 +1,18 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
 
+package com.example.joinery.models;
 
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.Period;
 
+/**
+ * This class represents a person in the system.
+ * It implements the {@link IPerson} interface, allowing other classes to inherit its methods.
+ */
 @Entity
 @Table(name = "person")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -67,6 +73,11 @@ public class Person implements IPerson{
         this.dateOfBirth = dateOfBirth;
     }
 
+    /**
+     * Calculates the age of the person based on their date of birth.
+     *
+     * @return The number of years that have passed since the customer was born.
+     */
     @Transient
     @Override
     public int getAge(){

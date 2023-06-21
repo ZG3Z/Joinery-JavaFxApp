@@ -1,22 +1,36 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
 
-import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+package com.example.joinery.models;
+
+import com.example.joinery.enums.ContactPreference;
+import com.example.joinery.enums.PaymentPreference;
+
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Map;
 
 @Entity
 @Table(name = "wholesaleCustomer")
 @PrimaryKeyJoinColumn(name = "idCW")
 public class WholesaleCustomer extends Customer {
+    @Basic
     private String companyName;
-    private String nip;
-    private static int FIXED_BUSINESS_DISCOUNT = 5;
-    public WholesaleCustomer(){}
 
+    @Basic
+    private String nip;
+
+    /**
+     * A constant representing the fixed discount percentage
+     * for all wholesale customers' orders, set to 5%.
+     */
+    private static int FIXED_BUSINESS_DISCOUNT = 5;
+
+    public WholesaleCustomer(){}
     public WholesaleCustomer(Long id, String companyName, String nip,
-                             LocalDate dateJoined, PaymentPreference paymentPreference, ContactPreference contactPreference,
+                             LocalDate dateJoined, PaymentPreference paymentPreference,
+                             ContactPreference contactPreference,
                              String telephone, String email){
         super();
         setIdC(id);
@@ -46,6 +60,12 @@ public class WholesaleCustomer extends Customer {
         this.nip = nip;
     }
 
+    /**
+     * Calculates the discount for the order based on the customer's membership age (1 year = 1%)
+     * and a fixed business discount.
+     *
+     * @return The discount amount, which is the sum of the membership age and the fixed business discount.
+     */
     @Transient
     @Override
     public int getDiscount() {

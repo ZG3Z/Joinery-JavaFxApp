@@ -2,7 +2,8 @@ package com.example.joinery;
 
 
 
-import com.example.joinery.entity.*;
+import com.example.joinery.models.*;
+import com.example.joinery.enums.Status;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -44,7 +45,7 @@ public class Main {
             session.beginTransaction();
             ServiceOrder serviceOrder = new ServiceOrder();
             serviceOrder.setDate(LocalDate.now());
-            serviceOrder.setStatus(ServiceOrder.Status.planned);
+            serviceOrder.setStatus(Status.planned);
 
             serviceOrder.addCustomer(customers.get(0));
             serviceOrder.setService(cServices.get(cServices.size()-1));

@@ -1,5 +1,10 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
 
+package com.example.joinery.models;
+
+import com.example.joinery.enums.LevelOfDamage;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +13,11 @@ import java.util.List;
 @Table(name = "conservation")
 @PrimaryKeyJoinColumn(name = "idC")
 public class Conservation extends Service {
-    public enum LevelOfDamage {high, low}
 
+    /**
+     * Represents the level of damage to an object subjected to conservation.
+     * It is an enumerated type {@link LevelOfDamage}.
+     */
     @Enumerated(EnumType.STRING)
     private LevelOfDamage levelOfDamage;
 
@@ -26,7 +34,7 @@ public class Conservation extends Service {
     public Conservation(long id, LevelOfDamage levelOfDamage) {
         super();
         setId(id);
-        setCostPerDay(200);
+        setCostPerDay(COST_PER_DAY_CONSERVATION);
 
         setLevelOfDamage(levelOfDamage);
     }
@@ -46,14 +54,12 @@ public class Conservation extends Service {
     public void addChemical(Chemical newChemical){
         if(!chemicalList.contains(newChemical)) {
             chemicalList.add(newChemical);
-            newChemical.addConservation(this);
         }
     }
 
     public void removeChemical(Chemical chemical){
         if(chemicalList.contains(chemical)) {
             chemicalList.remove(chemical);
-            chemical.removeConservation(this);
         }
     }
 
@@ -61,6 +67,14 @@ public class Conservation extends Service {
         this.chemicalList = chemicalList;
     }
 
+    /**
+     * Calculates the number of days needed to complete the service.
+     * The number of days to complete is determined
+     * by the number of chemicals in the chemical list
+     * and the level of damage (high - 10, low - 5).
+     *
+     * @return The number of days to complete the service.
+     */
     @Transient
     @Override
     public int getDaysToComplete() {
@@ -69,6 +83,15 @@ public class Conservation extends Service {
         return chemicalList.size() + sizeLevelOfDamage;
     }
 
+
+    /**
+     * Calculates the total cost of the service.
+     * The total cost is calculated by multiplying the cost per day
+     * with the number of days to complete the service,
+     * and adding the prices of all the chemicals in the chemical list.
+     *
+     * @return The total service cost.
+     */
     @Transient
     @Override
     public int getTotalServiceCost() {

@@ -1,8 +1,10 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
 
-import com.example.joinery.entity.Assembly;
+package com.example.joinery.models;
+
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,14 +54,13 @@ public class Material {
     public void addAssembly(Assembly newAssembly){
         if(!assemblyList.contains(newAssembly)) {
             assemblyList.add(newAssembly);
-            newAssembly.addMaterial(this);
+
         }
     }
 
     public void removeAssembly(Assembly assembly){
         if(assemblyList.contains(assembly)){
             assemblyList.remove(assembly);
-            assembly.removeMaterial(this);
         }
     }
 

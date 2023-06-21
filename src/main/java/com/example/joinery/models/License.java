@@ -1,4 +1,8 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
+
+package com.example.joinery.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -19,23 +23,15 @@ public class License {
     @Basic
     private LocalDate dateOfIssue;
 
-    private static int VALIDITY_IN_YEARS = 5;
-
     @ManyToOne
-    @JoinColumn(name = "idS", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "idS", referencedColumnName = "id")
     private Specialization specialization;
 
     @ManyToOne
-    @JoinColumn(name = "idE", referencedColumnName = "idE", insertable = false, updatable = false)
+    @JoinColumn(name = "idE", referencedColumnName = "idE")
     private Employee employee;
 
     public License(){}
-
-    public License(long idS, long idE, LocalDate dateOfIssue){
-        setIdS(idS);
-        setIdE(idE);
-        setDateOfIssue(dateOfIssue);
-    }
 
     public Long getIdS() {
         return idS;

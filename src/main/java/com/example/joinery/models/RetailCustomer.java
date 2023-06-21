@@ -1,26 +1,43 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
+
+package com.example.joinery.models;
+
+import com.example.joinery.enums.ContactPreference;
+import com.example.joinery.enums.LoyaltyCardLevel;
+import com.example.joinery.enums.PaymentPreference;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "retailCustomer")
 @PrimaryKeyJoinColumn(name = "idCR")
 public class RetailCustomer extends Customer implements IPerson{
-    private enum LoyaltyCardLevel {STANDARD, SILVER, GOLD}
 
+    /**
+     * The field represents the loyalty card level of the retail customer.
+     * It is an enumerated type {@link LoyaltyCardLevel}.
+     */
     @Enumerated(value = EnumType.STRING)
     private LoyaltyCardLevel loyaltyCardLevel;
 
+    /**
+     * A person-related object for a retail client.
+     * This means customer personal information.
+     */
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "idCR", insertable = false, updatable = false)
     private final Person person = new Person();
 
     public RetailCustomer(){}
-
     public RetailCustomer(Long id, String firstName, String lastName, LocalDate dateOfBirth,
                           LocalDate dateJoined, PaymentPreference paymentPreference, ContactPreference contactPreference,
-                          String telephone, String email, LoyaltyCardLevel loyaltyCardLevel){
+                          String telephone, String email,
+                          LoyaltyCardLevel loyaltyCardLevel){
         super();
 
         person.setId(id);
@@ -89,6 +106,12 @@ public class RetailCustomer extends Customer implements IPerson{
         this.loyaltyCardLevel = loyaltyCardLevel;
     }
 
+    /**
+     * Calculates retail customer discount based on membership age (1 year = 1%)
+     * and loyalty card level (standard - 2%, silver - 5%, gold - 7%).
+     *
+     * @return The discount amount, which is the sum of the membership age and the loyalty card level discount.
+     */
     @Transient
     @Override
     public int getDiscount() {

@@ -1,4 +1,8 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
+
+package com.example.joinery.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -21,7 +25,7 @@ public class Employee extends Person {
 
     public Employee() {}
 
-    public Employee(Long id, String firstName, String lastName, LocalDate dateOfBirth, LocalDate employmentDate) {
+    public Employee(Long id, String firstName, String lastName, LocalDate dateOfBirth, LocalDate employmentDate, List<License> licenses) {
         super();
         setId(id);
         setFirstName(firstName);
@@ -29,6 +33,7 @@ public class Employee extends Person {
         setDateOfBirth(dateOfBirth);
 
         setEmploymentDate(employmentDate);
+        setLicenses(licenses);
     }
 
     public LocalDate getEmploymentDate() {
@@ -59,28 +64,31 @@ public class Employee extends Person {
         this.licenses = licenses;
     }
 
-    public List<ServiceOrder> getWorkOrders() {
+    public List<ServiceOrder> getServiceOrders() {
         return serviceOrders;
     }
 
     public void addServiceOrder(ServiceOrder newServiceOrder) {
         if (!serviceOrders.contains(newServiceOrder)){
             serviceOrders.add(newServiceOrder);
-            newServiceOrder.addEmployee(this);
         }
     }
 
     public void removeServiceOrder(ServiceOrder serviceOrder){
         if (serviceOrders.contains(serviceOrder)){
             serviceOrders.remove(serviceOrder);
-            serviceOrder.removeEmployee();
         }
     }
 
-    public void setWorkOrders(List<ServiceOrder> serviceOrders) {
+    public void setServiceOrders(List<ServiceOrder> serviceOrders) {
         this.serviceOrders = serviceOrders;
     }
 
+    /**
+     * Calculates the tenure of the employee based on the date of employment.
+     *
+     * @return The number of years that have passed since the employee was hired.
+     */
     @Transient
     public int getTenure(){
         return Period.between(employmentDate, LocalDate.now()).getYears();

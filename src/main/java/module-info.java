@@ -9,8 +9,8 @@ module com.example.joinery {
 
     opens com.example.joinery to javafx.fxml, org.hibernate.orm.core;
     exports com.example.joinery;
-    exports com.example.joinery.controller;
-    opens com.example.joinery.controller to javafx.fxml, org.hibernate.orm.core;
-    exports com.example.joinery.entity;
-    opens com.example.joinery.entity to javafx.fxml, org.hibernate.orm.core;
+    exports com.example.joinery.controllers;
+    opens com.example.joinery.controllers to javafx.fxml, org.hibernate.orm.core;
+    exports com.example.joinery.models;
+    opens com.example.joinery.models to javafx.fxml, org.hibernate.orm.core;
 }

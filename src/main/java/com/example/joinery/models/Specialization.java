@@ -1,5 +1,10 @@
-package com.example.joinery.entity;
+/**
+ * @Author: Zuzanna Gez
+ */
 
+package com.example.joinery.models;
+
+import com.example.joinery.enums.CategorySpecialization;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -9,7 +14,6 @@ import java.util.List;
 @Entity
 @Table(name = "specialization")
 public class Specialization {
-    public enum CategorySpecialization{Assembly, Conservation}
 
     @Id
     @GeneratedValue(generator="increment")
@@ -19,6 +23,10 @@ public class Specialization {
     @Basic
     private String name;
 
+    /**
+     * Represents the type of service that corresponds to the specialization.
+     * It is an enumerated type {@link CategorySpecialization}.
+     */
     @Enumerated(value = EnumType.STRING)
     private CategorySpecialization category;
 
@@ -27,10 +35,11 @@ public class Specialization {
 
     public Specialization(){}
 
-    public Specialization(long id, String name, CategorySpecialization category){
+    public Specialization(long id, String name, CategorySpecialization category, List<License> licenses){
         setId(id);
         setName(name);
         setCategory(category);
+        setLicenses(licenses);
     }
 
     public long getId() {

@@ -18,20 +18,20 @@
     <property name="hbm2ddl.auto">validate</property> <!-- Enable Hibernate stats in the logs -->
     <property name="hibernate.generate_statistics">true</property>
     <!-- Full names the annotated entity class -->
-    <mapping class="com.example.joinery.entity.Person"/>
-    <mapping class="com.example.joinery.entity.Employee"/>
-    <mapping class="com.example.joinery.entity.Customer"/>
-    <mapping class="com.example.joinery.entity.RetailCustomer"/>
-    <mapping class="com.example.joinery.entity.WholesaleCustomer"/>
-    <mapping class="com.example.joinery.entity.License"/>
-    <mapping class="com.example.joinery.entity.Specialization"/>
-    <mapping class="com.example.joinery.entity.Service"/>
-    <mapping class="com.example.joinery.entity.Assembly"/>
-    <mapping class="com.example.joinery.entity.Conservation"/>
-    <mapping class="com.example.joinery.entity.Material"/>
-    <mapping class="com.example.joinery.entity.WoodMaterial"/>
-    <mapping class="com.example.joinery.entity.WoodLikeMaterial"/>
-    <mapping class="com.example.joinery.entity.Chemical"/>
-    <mapping class="com.example.joinery.entity.ServiceOrder"/>
+    <mapping class="com.example.joinery.models.Person"/>
+    <mapping class="com.example.joinery.models.Employee"/>
+    <mapping class="com.example.joinery.models.Customer"/>
+    <mapping class="com.example.joinery.models.RetailCustomer"/>
+    <mapping class="com.example.joinery.models.WholesaleCustomer"/>
+    <mapping class="com.example.joinery.models.License"/>
+    <mapping class="com.example.joinery.models.Specialization"/>
+    <mapping class="com.example.joinery.models.Service"/>
+    <mapping class="com.example.joinery.models.Assembly"/>
+    <mapping class="com.example.joinery.models.Conservation"/>
+    <mapping class="com.example.joinery.models.Material"/>
+    <mapping class="com.example.joinery.models.WoodMaterial"/>
+    <mapping class="com.example.joinery.models.WoodLikeMaterial"/>
+    <mapping class="com.example.joinery.models.Chemical"/>
+    <mapping class="com.example.joinery.models.ServiceOrder"/>
 </session-factory>
 </hibernate-configuration>
