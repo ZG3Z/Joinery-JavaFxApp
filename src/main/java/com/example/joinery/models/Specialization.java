@@ -34,13 +34,6 @@ public class Specialization {
 
     public Specialization(){}
 
-    public Specialization(long id, String name, CategorySpecialization category, List<License> licenses){
-        setId(id);
-        setName(name);
-        setCategory(category);
-        setLicenses(licenses);
-    }
-
     public long getId() {
         return id;
     }

@@ -6,6 +6,7 @@ package com.example.joinery.controllers;
 
 import com.example.joinery.Services.IDatabase;
 import com.example.joinery.Services.MySqlDatabase;
+import com.example.joinery.enums.Status;
 import com.example.joinery.models.*;
 import com.example.joinery.enums.CategorySpecialization;
 import com.example.joinery.enums.LevelOfDamage;
@@ -18,6 +19,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,7 +48,7 @@ public class Controller {
     ObservableList<ServiceOrder> serviceOrders = FXCollections.observableArrayList();
 
     private Service newService;
-    private ServiceOrder newOrder;
+    private ServiceOrder newOrder = new ServiceOrder();
 
     @FXML
     private GridPane ordersViewGridPane;
@@ -110,15 +113,12 @@ public class Controller {
     /**
      * Initializes the controller and sets up event listeners for UI components.
      * It loads data from the database for the given entity types: "Order", "Retail customer", "Wholesale customer".
-     * It also initializes a new ServiceOrder object with a unique ID based on the current number of serviceOrders.
      * The method sets up choice boxes, text fields, sliders, and other UI components with their respective event listeners
      * to handle changes in user input.
      */
     @FXML
     public void initialize() {
         loadDataFromDatabase(List.of("Order", "Retail customer", "Wholesale customer"));
-
-        newOrder = new ServiceOrder(serviceOrders.size() + 1);
 
         setChoiceBoxData();
 
@@ -313,14 +313,9 @@ public class Controller {
      */
     private void createNewService(){
         switch (serviceChoiceBox.getValue().toString()) {
-            case "Assembly" -> newService = new Assembly(
-                    assemblyServices.size() + conservationServices.size(),
-                    assemblyProductNameTextField.getText(),
-                    (int) assemblySizeSlider.getValue());
+            case "Assembly" -> newService = new Assembly();
 
-            case "Conservation" -> newService = new Conservation(
-                    assemblyServices.size() + conservationServices.size(),
-                    LevelOfDamage.low);
+            case "Conservation" -> newService = new Conservation();
         }
     }
 
@@ -491,6 +486,7 @@ public class Controller {
     @FXML
     private void saveAssignedService(){
         loadDataFromDatabase(List.of("Employee", "Specialization"));
+        newOrder.addService(newService);
         database.addNewService(newService);
 
         materialText.setVisible(false);
@@ -601,9 +597,11 @@ public class Controller {
      * The UI is updated to show the service orders view and hide the add order grid pane.
      */
     private void addServiceToOrder(){
-        newOrder.addService(newService);
+        newOrder.setDate(LocalDate.now());
+        newOrder.setStatus(Status.planned);
         database.addNewServiceOrder(newOrder);
-        serviceOrders.add(newOrder);
+
+        loadDataFromDatabase(List.of("Order"));
         ordersViewGridPane.setVisible(true);
         addOrderGridPane.setVisible(false);
    }

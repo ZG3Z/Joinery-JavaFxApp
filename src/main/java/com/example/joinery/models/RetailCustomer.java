@@ -26,28 +26,11 @@ public class RetailCustomer extends Customer implements IPerson{
      * A person-related object for a retail client.
      * This means customer personal information.
      */
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idCR", insertable = false, updatable = false)
     private final Person person = new Person();
 
     public RetailCustomer(){}
-    public RetailCustomer(Long id, String firstName, String lastName, LocalDate dateOfBirth,
-                          LocalDate dateJoined, PaymentPreference paymentPreference, ContactPreference contactPreference,
-                          String telephone, String email,
-                          LoyaltyCardLevel loyaltyCardLevel){
-        super();
-        person.setId(id);
-        person.setFirstName(firstName);
-        person.setLastName(lastName);
-        person.setDateOfBirth(dateOfBirth);
-        setIdC(id);
-        setDateJoined(dateJoined);
-        setPaymentPreference(paymentPreference);
-        setContactPreference(contactPreference);
-        setTelephone(telephone);
-        setEmail(email);
-        setLoyaltyCardLevel(loyaltyCardLevel);
-    }
 
     @Override
     public long getId() {

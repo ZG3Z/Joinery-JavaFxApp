@@ -26,20 +26,6 @@ public class WholesaleCustomer extends Customer {
     private static int FIXED_BUSINESS_DISCOUNT = 5;
 
     public WholesaleCustomer(){}
-    public WholesaleCustomer(Long id, String companyName, String nip,
-                             LocalDate dateJoined, PaymentPreference paymentPreference,
-                             ContactPreference contactPreference,
-                             String telephone, String email){
-        super();
-        setIdC(id);
-        setDateJoined(dateJoined);
-        setPaymentPreference(paymentPreference);
-        setContactPreference(contactPreference);
-        setTelephone(telephone);
-        setEmail(email);
-        setCompanyName(companyName);
-        setNip(nip);
-    }
 
     public String getCompanyName() {
         return companyName;

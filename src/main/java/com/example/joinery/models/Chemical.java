@@ -37,13 +37,6 @@ public class Chemical {
 
     public Chemical(){}
 
-    public Chemical(long id, String name, int toxicityLevel, int price){
-        setId(id);
-        setName(name);
-        setToxicityLevel(toxicityLevel);
-        setPrice(price);
-    }
-
     public long getId() {
         return id;
     }

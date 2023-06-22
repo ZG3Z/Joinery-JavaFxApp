@@ -20,15 +20,6 @@ public class WoodLikeMaterial extends Material{
 
     public WoodLikeMaterial(){}
 
-    public WoodLikeMaterial(Long id, String material, String manufacturer, int price){
-        super();
-        setId(id);
-        setPrice(price);
-        setMaterial(material);
-        setManufacturer(manufacturer);
-    }
-
-
     public String getMaterial() {
         return material;
     }

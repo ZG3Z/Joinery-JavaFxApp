@@ -42,34 +42,19 @@ public class ServiceOrder {
      */
     private static Map<Long, ServiceOrder> uniqueIds = new HashMap<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idCustomer", referencedColumnName = "idC")
     private Customer customer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idService", referencedColumnName = "id")
     private Service service;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idEmployee", referencedColumnName = "idE")
     private Employee employee;
 
     public ServiceOrder(){}
-
-    public ServiceOrder(long id, Status status, LocalDate date, Customer customer, Service service, Employee employee){
-        setId(id);
-        setStatus(status);
-        setDate(date);
-        setCustomer(customer);
-        setService(service);
-        setEmployee(employee);
-    }
-
-    public ServiceOrder(long id){
-        setId(id);
-        setStatus(Status.planned);
-        setDate(LocalDate.now());
-    }
 
     public long getId() {
         return id;

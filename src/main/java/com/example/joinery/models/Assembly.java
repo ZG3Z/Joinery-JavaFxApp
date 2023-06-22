@@ -33,13 +33,6 @@ public class Assembly extends Service {
 
     public Assembly() {}
 
-    public Assembly(long id, String productName, int size) {
-        super();
-        setId(id);
-        setProductName(productName);
-        setSize(size);
-    }
-
     public String getProductName() {
         return productName;
     }

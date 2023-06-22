@@ -36,12 +36,6 @@ public class Conservation extends Service {
 
     public Conservation(){}
 
-    public Conservation(long id, LevelOfDamage levelOfDamage) {
-        super();
-        setId(id);
-        setLevelOfDamage(levelOfDamage);
-    }
-
     public LevelOfDamage getLevelOfDamage() {
         return levelOfDamage;
     }

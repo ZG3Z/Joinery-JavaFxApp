@@ -233,7 +233,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            session.save(newServiceOrder);
+            session.persist(newServiceOrder);
 
             session.getTransaction().commit();
         } catch (Exception e) {

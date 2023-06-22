@@ -20,20 +20,10 @@ public class Employee extends Person {
     @OneToMany(mappedBy = "idE", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<License> licenses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServiceOrder> serviceOrders = new ArrayList<>();
 
     public Employee() {}
-
-    public Employee(Long id, String firstName, String lastName, LocalDate dateOfBirth, LocalDate employmentDate, List<License> licenses) {
-        super();
-        setId(id);
-        setFirstName(firstName);
-        setLastName(lastName);
-        setDateOfBirth(dateOfBirth);
-        setEmploymentDate(employmentDate);
-        setLicenses(licenses);
-    }
 
     public LocalDate getEmploymentDate() {
         return employmentDate;
