@@ -18,8 +18,6 @@ import java.util.List;
 public interface IDatabase {
     List<RetailCustomer> getRetailCustomers();
     List<WholesaleCustomer> getWholesaleCustomers();
-    List<Assembly> getAssemblyServices();
-    List<Conservation> getConservationServices();
     List<WoodMaterial> getWoodMaterials();
     List<WoodLikeMaterial> getWoodLikeMaterials();
     List<Chemical> getChemicals();

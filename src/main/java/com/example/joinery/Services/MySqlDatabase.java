@@ -72,42 +72,6 @@ public class MySqlDatabase implements IDatabase{
     }
 
     @Override
-    public List<Assembly> getAssemblyServices() {
-        List<Assembly> assemblyServices = new ArrayList<>();
-
-        try {
-            session.beginTransaction();
-
-            assemblyServices = session.createQuery("FROM Assembly ", Assembly.class).getResultList();
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-        }
-
-        return assemblyServices;
-    }
-
-    @Override
-    public List<Conservation> getConservationServices() {
-        List<Conservation> conservationServices = new ArrayList<>();
-
-        try {
-            session.beginTransaction();
-
-            conservationServices = session.createQuery("FROM Conservation ", Conservation.class).getResultList();
-
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-        }
-
-        return conservationServices;
-    }
-
-    @Override
     public List<WoodMaterial> getWoodMaterials() {
         List<WoodMaterial> woodMaterials = new ArrayList<>();
 

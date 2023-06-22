@@ -19,7 +19,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,8 +37,6 @@ public class Controller {
 
     ObservableList<RetailCustomer> retailCustomers = FXCollections.observableArrayList();
     ObservableList<WholesaleCustomer> wholesaleCustomers = FXCollections.observableArrayList();
-    ObservableList<Assembly> assemblyServices = FXCollections.observableArrayList();
-    ObservableList<Conservation> conservationServices = FXCollections.observableArrayList();
     ObservableList<WoodMaterial> woodMaterials = FXCollections.observableArrayList();
     ObservableList<WoodLikeMaterial> woodLikeMaterials = FXCollections.observableArrayList();
     ObservableList<Chemical> chemicals = FXCollections.observableArrayList();
@@ -118,7 +115,7 @@ public class Controller {
      */
     @FXML
     public void initialize() {
-        loadDataFromDatabase(List.of("Order", "Retail customer", "Wholesale customer"));
+        loadDataFromDatabase(List.of("Retail customer", "Wholesale customer"));
 
         setChoiceBoxData();
 
@@ -591,19 +588,27 @@ public class Controller {
     }
 
     /**
-     * Adds the service to the service order, updates the database, and updates the UI.
-     * The service is added to the new order.
-     * The new order is added to the database and the list of service orders.
-     * The UI is updated to show the service orders view and hide the add order grid pane.
+     * Adds a service to the order and saves the order in the database.
+     * Sets the current date, sets the order status to "planned", and removes the previous service from the order.
+     * Adds the new service to the order and then saves the order in the database.
+     * Calls the `viewOrders()` method to switch to the orders view.
      */
     private void addServiceToOrder(){
         newOrder.setDate(LocalDate.now());
         newOrder.setStatus(Status.planned);
+        newOrder.removeService();
+        newOrder.addService(newService);
         database.addNewServiceOrder(newOrder);
+        viewOrders();
+   }
 
-        loadDataFromDatabase(List.of("Order"));
-        ordersViewGridPane.setVisible(true);
-        addOrderGridPane.setVisible(false);
+    /**
+     * Displays the orders view by loading data from the database and setting the visibility flags for the panels.
+     */
+   private void viewOrders(){
+       loadDataFromDatabase(List.of("Order"));
+       ordersViewGridPane.setVisible(true);
+       addOrderGridPane.setVisible(false);
    }
 
     /**
@@ -618,7 +623,6 @@ public class Controller {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
-
     }
 
     /**
@@ -685,8 +689,6 @@ public class Controller {
             switch (tableName) {
                 case "Retail customer" -> retailCustomers.setAll(database.getRetailCustomers());
                 case "Wholesale customer" -> wholesaleCustomers.setAll(database.getWholesaleCustomers());
-                case "Assembly" -> assemblyServices.setAll(database.getAssemblyServices());
-                case "Conservation" -> conservationServices.setAll(database.getConservationServices());
                 case "Wood material" -> woodMaterials.setAll(database.getWoodMaterials());
                 case "Wood like material" -> woodLikeMaterials.setAll(database.getWoodLikeMaterials());
                 case "Chemical" -> chemicals.setAll(database.getChemicals());
