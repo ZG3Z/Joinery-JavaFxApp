@@ -31,7 +31,6 @@ public class Employee extends Person {
         setFirstName(firstName);
         setLastName(lastName);
         setDateOfBirth(dateOfBirth);
-
         setEmploymentDate(employmentDate);
         setLicenses(licenses);
     }

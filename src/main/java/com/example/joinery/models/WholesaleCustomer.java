@@ -6,10 +6,8 @@ package com.example.joinery.models;
 
 import com.example.joinery.enums.ContactPreference;
 import com.example.joinery.enums.PaymentPreference;
-
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Map;
 
 @Entity
 @Table(name = "wholesaleCustomer")
@@ -39,7 +37,6 @@ public class WholesaleCustomer extends Customer {
         setContactPreference(contactPreference);
         setTelephone(telephone);
         setEmail(email);
-
         setCompanyName(companyName);
         setNip(nip);
     }

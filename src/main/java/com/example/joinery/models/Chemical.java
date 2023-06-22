@@ -17,10 +17,13 @@ public class Chemical {
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private long id;
+
     @Basic
     private String name;
+
     @Basic
     private int toxicityLevel;
+
     @Basic
     private int price;
 

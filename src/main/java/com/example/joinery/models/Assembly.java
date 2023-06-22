@@ -14,8 +14,10 @@ import java.util.List;
 public class Assembly extends Service {
     @Basic
     private String productName;
+
     @Basic
     private int size;
+
     @ManyToMany()
     @JoinTable(
             name = "assemblymaterial",
@@ -24,17 +26,19 @@ public class Assembly extends Service {
     )
     private List<Material> materialList = new ArrayList<>();
 
+    /**
+     * A constant representing the cost per day for assembly, set to 100.
+     */
+    public static int COST_PER_DAY_ASSEMBLY = 100;
+
     public Assembly() {}
 
     public Assembly(long id, String productName, int size) {
         super();
         setId(id);
-        setCostPerDay(COST_PER_DAY_ASSEMBLY);
-
         setProductName(productName);
         setSize(size);
     }
-
 
     public String getProductName() {
         return productName;
@@ -81,6 +85,12 @@ public class Assembly extends Service {
 
     public void setMaterialList(List<Material> materialList) {
         this.materialList = materialList;
+    }
+
+    @Transient
+    @Override
+    public int getCostPerDay() {
+        return COST_PER_DAY_ASSEMBLY;
     }
 
     /**

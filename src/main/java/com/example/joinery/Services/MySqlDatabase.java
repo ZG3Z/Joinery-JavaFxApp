@@ -18,6 +18,10 @@ import java.util.List;
  *  It provides methods to interact with the MySQL database using Hibernate ORM.
  */
 public class MySqlDatabase implements IDatabase{
+
+    /**
+     * Creates a Hibernate SessionFactory based on the configuration specified in the "hibernate.cfg.xml" file.
+     */
     SessionFactory sessionFactory = new Configuration()
             .configure("hibernate.cfg.xml")
             .buildSessionFactory();
@@ -25,8 +29,8 @@ public class MySqlDatabase implements IDatabase{
     private final Session session;
 
     /**
-     * Creates a new instance of the MySqlDatabase class.
-     * It initializes Hibernate session by opening a new session using the session factory.
+     * Constructs a new instance of the MySqlDatabase class.
+     * It initializes a new Hibernate session by opening a session from the session factory.
      */
     public MySqlDatabase(){
         session  = sessionFactory.openSession();
@@ -39,41 +43,8 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<RetailCustomer> rCustomers = session.createQuery("FROM RetailCustomer ", RetailCustomer.class).getResultList();
+            retailCustomers = session.createQuery("FROM RetailCustomer ", RetailCustomer.class).getResultList();
 
-            for(RetailCustomer customer : rCustomers){
-                RetailCustomer retailCustomer = new RetailCustomer();
-
-                retailCustomer.setId(customer.getId());
-                retailCustomer.setIdC(customer.getId());
-                retailCustomer.setFirstName(customer.getFirstName());
-                retailCustomer.setLastName(customer.getLastName());
-                retailCustomer.setDateOfBirth(customer.getDateOfBirth());
-                retailCustomer.setDateJoined(customer.getDateJoined());
-                retailCustomer.setContactPreference(customer.getContactPreference());
-                retailCustomer.setPaymentPreference(customer.getPaymentPreference());
-                retailCustomer.setTelephone(customer.getTelephone());
-                retailCustomer.setEmail(customer.getEmail());
-                retailCustomer.setLoyaltyCardLevel(customer.getLoyaltyCardLevel());
-                retailCustomer.setServiceOrders(customer.getServiceOrders());
-
-                retailCustomers.add(retailCustomer);
-                /*
-                retailCustomers.add(new RetailCustomer(
-                        customer.getId(),
-                        customer.getFirstName(),
-                        customer.getLastName(),
-                        customer.getDateOfBirth(),
-                        customer.getDateJoined(),
-                        customer.getPaymentPreference(),
-                        customer.getContactPreference(),
-                        customer.getTelephone(),
-                        customer.getEmail(),
-                        customer.getLoyaltyCardLevel()
-                ));
-
-                 */
-            }
             session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,37 +60,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<WholesaleCustomer> wCustomers = session.createQuery("FROM WholesaleCustomer ", WholesaleCustomer.class).getResultList();
-
-            for(WholesaleCustomer customer : wCustomers){
-                WholesaleCustomer wholesaleCustomer = new WholesaleCustomer();
-
-                wholesaleCustomer.setIdC(customer.getIdC());
-                wholesaleCustomer.setCompanyName(customer.getCompanyName());
-                wholesaleCustomer.setNip(customer.getNip());
-                wholesaleCustomer.setDateJoined(customer.getDateJoined());
-                wholesaleCustomer.setContactPreference(customer.getContactPreference());
-                wholesaleCustomer.setPaymentPreference(customer.getPaymentPreference());
-                wholesaleCustomer.setTelephone(customer.getTelephone());
-                wholesaleCustomer.setEmail(customer.getEmail());
-                wholesaleCustomer.setServiceOrders(customer.getServiceOrders());
-
-                wholesaleCustomers.add(wholesaleCustomer);
-
-                /*
-                wholesaleCustomers.add(new WholesaleCustomer(
-                        customer.getIdC(),
-                        customer.getCompanyName(),
-                        customer.getNip(),
-                        customer.getDateJoined(),
-                        customer.getPaymentPreference(),
-                        customer.getContactPreference(),
-                        customer.getTelephone(),
-                        customer.getEmail()
-                ));
-
-                 */
-            }
+            wholesaleCustomers = session.createQuery("FROM WholesaleCustomer ", WholesaleCustomer.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -137,25 +78,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<Assembly> aServices = session.createQuery("FROM Assembly ", Assembly.class).getResultList();
-
-            for(Assembly service : aServices){
-                Assembly assembly = new Assembly();
-                assembly.setId(service.getId());
-                assembly.setProductName(service.getProductName());
-                assembly.setSize(service.getSize());
-                assembly.setMaterialList(service.getMaterials());
-                assembly.setServiceOrders(service.getServiceOrders());
-                assemblyServices.add(assembly);
-                /*
-                assemblyServices.add(new Assembly(
-                        service.getId(),
-                        service.getProductName(),
-                        service.getSize()
-                ));
-
-                 */
-            }
+            assemblyServices = session.createQuery("FROM Assembly ", Assembly.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -173,23 +96,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<Conservation> cServices = session.createQuery("FROM Conservation ", Conservation.class).getResultList();
-
-            for(Conservation service : cServices){
-                Conservation conservation = new Conservation();
-                conservation.setId(service.getId());
-                conservation.setLevelOfDamage(service.getLevelOfDamage());
-                conservation.setChemicalList(service.getChemicalList());
-                conservation.setServiceOrders(service.getServiceOrders());
-                conservationServices.add(conservation);
-                /*
-                conservationServices.add(new Conservation(
-                        service.getId(),
-                        service.getLevelOfDamage()
-                ));
-
-                 */
-            }
+            conservationServices = session.createQuery("FROM Conservation ", Conservation.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -207,28 +114,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<WoodMaterial>  wMaterials = session.createQuery("FROM WoodMaterial ", WoodMaterial.class).getResultList();
-
-            for(WoodMaterial material : wMaterials){
-                WoodMaterial woodMaterial = new WoodMaterial();
-
-                woodMaterial.setId(material.getId());
-                woodMaterial.setWoodType(material.getWoodType());
-                woodMaterial.setHardness(material.getHardness());
-                woodMaterial.setPrice(material.getPrice());
-                woodMaterial.setAssemblyList(material.getAssemblyList());
-
-                woodMaterials.add(woodMaterial);
-                /*
-                woodMaterials.add(new WoodMaterial(
-                        material.getId(),
-                        material.getWoodType(),
-                        material.getHardness(),
-                        material.getPrice()
-                ));
-
-                 */
-            }
+            woodMaterials = session.createQuery("FROM WoodMaterial").getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -246,29 +132,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<WoodLikeMaterial> wlMaterials = session.createQuery("FROM WoodLikeMaterial ", WoodLikeMaterial.class).getResultList();
-
-            for(WoodLikeMaterial material : wlMaterials){
-                WoodLikeMaterial woodLikeMaterial = new WoodLikeMaterial();
-
-                woodLikeMaterial.setId(material.getId());
-                woodLikeMaterial.setMaterial(material.getMaterial());
-                woodLikeMaterial.setManufacturer(material.getManufacturer());
-                woodLikeMaterial.setPrice(material.getPrice());
-                woodLikeMaterial.setAssemblyList(material.getAssemblyList());
-
-                woodLikeMaterials.add(woodLikeMaterial);
-
-                /*
-                woodLikeMaterials.add(new WoodLikeMaterial(
-                        material.getId(),
-                        material.getMaterial(),
-                        material.getManufacturer(),
-                        material.getPrice()
-                ));
-
-                 */
-            }
+            woodLikeMaterials = session.createQuery("FROM WoodLikeMaterial ",  WoodLikeMaterial.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -286,28 +150,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<Chemical> chemicals = session.createQuery("FROM Chemical ", Chemical.class).getResultList();
-
-            for(Chemical ch : chemicals){
-                Chemical chemical = new Chemical();
-
-                chemical.setId(ch.getId());
-                chemical.setName(ch.getName());
-                chemical.setToxicityLevel(ch.getToxicityLevel());
-                chemical.setPrice(ch.getPrice());
-                chemical.setConservationList(ch.getConservationList());
-
-                chemicalList.add(chemical);
-                /*
-                chemicalList.add(new Chemical(
-                        ch.getId(),
-                        ch.getName(),
-                        ch.getToxicityLevel(),
-                        ch.getPrice()
-                ));
-
-                 */
-            }
+            chemicalList = session.createQuery("FROM Chemical ", Chemical.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -325,33 +168,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<Employee> employees = session.createQuery("FROM Employee ", Employee.class).getResultList();
-
-            for(Employee emp : employees){
-                Employee employee = new Employee();
-
-                employee.setId(emp.getId());
-                employee.setFirstName(emp.getFirstName());
-                employee.setLastName(emp.getLastName());
-                employee.setDateOfBirth(emp.getDateOfBirth());
-                employee.setEmploymentDate(emp.getEmploymentDate());
-                employee.setLicenses(emp.getLicenses());
-                employee.setServiceOrders(emp.getServiceOrders());
-
-                employeeList.add(employee);
-
-                /*
-                employeeList.add(new Employee(
-                        emp.getId(),
-                        emp.getFirstName(),
-                        emp.getLastName(),
-                        emp.getDateOfBirth(),
-                        emp.getEmploymentDate(),
-                        emp.getLicenses()
-                ));
-
-                 */
-            }
+            employeeList = session.createQuery("FROM Employee ", Employee.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -369,27 +186,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<Specialization> specializations = session.createQuery("FROM Specialization ", Specialization.class).getResultList();
-
-            for(Specialization spec : specializations){
-                Specialization specialization = new Specialization();
-
-                specialization.setId(spec.getId());
-                specialization.setName(spec.getName());
-                specialization.setCategory(spec.getCategory());
-                specialization.setLicenses(spec.getLicenses());
-
-                specializationList.add(specialization);
-                /*
-                specializationList.add(new Specialization(
-                        spec.getId(),
-                        spec.getName(),
-                        spec.getCategory(),
-                        spec.getLicenses()
-                ));
-
-                 */
-            }
+            specializationList = session.createQuery("FROM Specialization ", Specialization.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -407,30 +204,7 @@ public class MySqlDatabase implements IDatabase{
         try {
             session.beginTransaction();
 
-            List<ServiceOrder> sOrders = session.createQuery("FROM ServiceOrder ", ServiceOrder.class).getResultList();
-
-            for(ServiceOrder order : sOrders) {
-                ServiceOrder serviceOrder = new ServiceOrder();
-                serviceOrder.setId(order.getId());
-                serviceOrder.setStatus(order.getStatus());
-                serviceOrder.setDate(order.getDate());
-                serviceOrder.setCustomer(order.getCustomer());
-                serviceOrder.setService(order.getService());
-                serviceOrder.setEmployee(order.getEmployee());
-
-                serviceOrders.add(serviceOrder);
-                /*
-                serviceOrders.add(new ServiceOrder(
-                        order.getId(),
-                        order.getStatus(),
-                        order.getDate(),
-                        order.getCustomer(),
-                        order.getService(),
-                        order.getEmployee()
-                ));
-
-                 */
-            }
+            serviceOrders = session.createQuery("FROM ServiceOrder ", ServiceOrder.class).getResultList();
 
             session.getTransaction().commit();
         } catch (Exception e) {
@@ -474,6 +248,4 @@ public class MySqlDatabase implements IDatabase{
             sessionFactory.close();
         }
     }
-
-
 }

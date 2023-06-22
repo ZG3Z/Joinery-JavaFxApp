@@ -13,23 +13,10 @@ import java.util.List;
 @Table(name = "service")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Service {
-    /**
-     * A constant representing the cost per day for assembly, set to 100.
-     */
-    public static int COST_PER_DAY_ASSEMBLY = 100;
-
-    /**
-     * A constant representing the cost per day for conservation, set to 200.
-     */
-    public static int COST_PER_DAY_CONSERVATION = 200;
-
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private long id;
-
-    @Basic
-    private int costPerDay;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServiceOrder> serviceOrders = new ArrayList<>();
@@ -44,13 +31,8 @@ public abstract class Service {
         this.id = id;
     }
 
-    public int getCostPerDay() {
-        return costPerDay;
-    }
-
-    public void setCostPerDay(int costPerDay) {
-        this.costPerDay = costPerDay;
-    }
+    @Transient
+    public abstract int getCostPerDay();
 
     /**
      * Calculates the estimated number of days needed to complete

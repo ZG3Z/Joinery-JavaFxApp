@@ -71,7 +71,6 @@ public class ServiceOrder {
         setDate(LocalDate.now());
     }
 
-
     public long getId() {
         return id;
     }
@@ -97,7 +96,6 @@ public class ServiceOrder {
     public void setDate(LocalDate date) {
         this.date = date;
     }
-
 
     /**
      * Calculates the start date of the order

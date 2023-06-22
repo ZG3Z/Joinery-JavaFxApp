@@ -29,13 +29,16 @@ public class Conservation extends Service {
     )
     private List<Chemical> chemicalList = new ArrayList<>();
 
+    /**
+     * A constant representing the cost per day for conservation, set to 200.
+     */
+    public static int COST_PER_DAY_CONSERVATION = 200;
+
     public Conservation(){}
 
     public Conservation(long id, LevelOfDamage levelOfDamage) {
         super();
         setId(id);
-        setCostPerDay(COST_PER_DAY_CONSERVATION);
-
         setLevelOfDamage(levelOfDamage);
     }
 
@@ -67,6 +70,12 @@ public class Conservation extends Service {
         this.chemicalList = chemicalList;
     }
 
+    @Transient
+    @Override
+    public int getCostPerDay() {
+        return COST_PER_DAY_CONSERVATION;
+    }
+
     /**
      * Calculates the number of days needed to complete the service.
      * The number of days to complete is determined
@@ -82,7 +91,6 @@ public class Conservation extends Service {
 
         return chemicalList.size() + sizeLevelOfDamage;
     }
-
 
     /**
      * Calculates the total cost of the service.

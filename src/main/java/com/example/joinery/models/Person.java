@@ -18,8 +18,6 @@ import java.time.Period;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Person implements IPerson{
     @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy = "increment")
     private long id;
 
     @Basic

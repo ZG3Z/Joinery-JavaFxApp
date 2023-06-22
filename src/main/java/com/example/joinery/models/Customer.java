@@ -18,8 +18,6 @@ import java.util.Map;
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Customer {
     @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy = "increment")
     private long idC;
 
     @Basic

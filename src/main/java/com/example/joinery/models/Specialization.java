@@ -6,7 +6,6 @@ package com.example.joinery.models;
 
 import com.example.joinery.enums.CategorySpecialization;
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

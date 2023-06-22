@@ -20,7 +20,7 @@
       <RowConstraints maxHeight="498.20928290486336" minHeight="489.25569796562195" prefHeight="489.25569796562195" />
   </rowConstraints>
    <children>
-      <GridPane fx:id="newOrderView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1200.0">
+      <GridPane fx:id="addOrderGridPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1200.0">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
@@ -163,11 +163,6 @@
                         <Insets left="5.0" />
                      </GridPane.margin>
                   </Button>
-                  <Button alignment="TOP_LEFT" contentDisplay="BOTTOM" mnemonicParsing="false" onAction="#viewOrders" text="VIEW ORDERS" GridPane.columnIndex="8" GridPane.rowIndex="2">
-                     <GridPane.margin>
-                        <Insets left="70.0" />
-                     </GridPane.margin>
-                  </Button>
                </children>
             </GridPane>
             <GridPane GridPane.rowIndex="1">
@@ -211,7 +206,7 @@
             <TableView fx:id="tableViewEmployee" onMouseClicked="#selectEmployee" prefHeight="310.0" prefWidth="1200.0" visible="false" GridPane.rowIndex="1" />
          </children>
       </GridPane>
-      <GridPane fx:id="ordersView" visible="false">
+      <GridPane fx:id="ordersViewGridPane" visible="false">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
@@ -226,8 +221,8 @@
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="269.7963562011719" minWidth="10.0" prefWidth="76.02601623535156" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="584.3734664916992" minWidth="10.0" prefWidth="580.9739837646484" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="154.0" minWidth="10.0" prefWidth="122.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="214.0" minWidth="10.0" prefWidth="196.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -235,7 +230,6 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button mnemonicParsing="false" onAction="#returnButton" text="RETURN" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                   <ChoiceBox fx:id="customerChoiceBox" prefHeight="25.0" prefWidth="584.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CUSTOMER:" GridPane.rowIndex="1">
                      <GridPane.margin>

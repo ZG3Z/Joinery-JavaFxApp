@@ -54,7 +54,6 @@ public class Material {
     public void addAssembly(Assembly newAssembly){
         if(!assemblyList.contains(newAssembly)) {
             assemblyList.add(newAssembly);
-
         }
     }
 

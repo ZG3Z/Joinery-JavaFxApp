@@ -7,11 +7,8 @@ package com.example.joinery.models;
 import com.example.joinery.enums.ContactPreference;
 import com.example.joinery.enums.LoyaltyCardLevel;
 import com.example.joinery.enums.PaymentPreference;
-
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "retailCustomer")
@@ -39,19 +36,16 @@ public class RetailCustomer extends Customer implements IPerson{
                           String telephone, String email,
                           LoyaltyCardLevel loyaltyCardLevel){
         super();
-
         person.setId(id);
         person.setFirstName(firstName);
         person.setLastName(lastName);
         person.setDateOfBirth(dateOfBirth);
-
         setIdC(id);
         setDateJoined(dateJoined);
         setPaymentPreference(paymentPreference);
         setContactPreference(contactPreference);
         setTelephone(telephone);
         setEmail(email);
-
         setLoyaltyCardLevel(loyaltyCardLevel);
     }
 

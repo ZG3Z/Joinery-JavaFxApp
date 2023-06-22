@@ -20,11 +20,10 @@ public class WoodMaterial extends Material{
 
     public WoodMaterial(){}
 
-    public WoodMaterial(long id, String woodType, int hardness, int price){
+    public WoodMaterial(Long id, String woodType, int hardness, int price){
         super();
         setId(id);
         setPrice(price);
-
         setWoodType(woodType);
         setHardness(hardness);
     }
